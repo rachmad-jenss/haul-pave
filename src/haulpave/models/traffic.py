@@ -37,13 +37,13 @@ class HaulSegment(BaseModel):
     fleet: list[FleetUnit] = Field(min_length=1)
 
     def __init__(self, **data: object) -> None:
+        super().__init__(**data)
         warnings.warn(
             "HaulSegment is experimental and has not been benchmark-tested. "
             "Validate outputs independently.",
             UserWarning,
             stacklevel=2,
         )
-        super().__init__(**data)
 
 
 class TrafficInput(BaseModel):

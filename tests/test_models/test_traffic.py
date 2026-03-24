@@ -51,9 +51,14 @@ class TestHaulSegment:
         assert seg.length_km == 5.0
 
     def test_zero_length_rejected(self, fleet_unit: FleetUnit) -> None:
-        with pytest.raises(ValidationError), warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with pytest.raises(ValidationError):
             HaulSegment(segment_id="S1", length_km=0.0, fleet=[fleet_unit])
+
+    def test_invalid_data_emits_no_warning(self, fleet_unit: FleetUnit) -> None:
+        with warnings.catch_warnings(record=True) as w, pytest.raises(ValidationError):
+            warnings.simplefilter("always")
+            HaulSegment(segment_id="S1", length_km=0.0, fleet=[fleet_unit])
+        assert len(w) == 0
 
 
 class TestTrafficInput:

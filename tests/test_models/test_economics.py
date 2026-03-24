@@ -51,6 +51,16 @@ class TestCostAssumptions:
                 operator_cost_per_hour=20.0,
             )
 
+    def test_invalid_currency_pattern_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            CostAssumptions(
+                fuel_cost_per_litre=1.0,
+                tyre_cost_per_hour=10.0,
+                maintenance_cost_per_km=1.0,
+                operator_cost_per_hour=20.0,
+                currency="usd",  # lowercase — must be uppercase
+            )
+
 
 class TestCostScenario:
     def test_valid(self, scenario: CostScenario) -> None:
@@ -89,5 +99,16 @@ class TestEconomicResult:
                 cost_per_trip=100.0,
                 trips_per_year=1000.0,
                 annual_cost=100_000.0,
+                currency="USD",
+            )
+
+    def test_empty_scenario_id_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            EconomicResult(
+                scenario_id="",
+                cost_per_tonne_km=0.85,
+                cost_per_trip=520.0,
+                trips_per_year=18_000.0,
+                annual_cost=9_360_000.0,
                 currency="USD",
             )

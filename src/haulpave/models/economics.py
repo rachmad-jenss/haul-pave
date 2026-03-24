@@ -19,7 +19,11 @@ class CostAssumptions(BaseModel):
     maintenance_cost_per_km: float = Field(ge=0, description="Maintenance cost [currency/km]")
     operator_cost_per_hour: float = Field(ge=0, description="Operator cost [currency/hr]")
     currency: str = Field(
-        default="USD", description="ISO 4217 currency code", min_length=3, max_length=3
+        default="USD",
+        description="ISO 4217 currency code",
+        min_length=3,
+        max_length=3,
+        pattern=r"^[A-Z]{3}$",
     )
 
 
@@ -41,10 +45,10 @@ class EconomicResult(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    scenario_id: str
+    scenario_id: str = Field(min_length=1)
     cost_per_tonne_km: float = Field(ge=0, description="Unit transport cost [currency/t·km]")
     cost_per_trip: float = Field(ge=0, description="Total cost per one-way trip [currency]")
     trips_per_year: float = Field(ge=0, description="Annual trip count")
     annual_cost: float = Field(ge=0, description="Annual operating cost [currency]")
-    currency: str = Field(min_length=3, max_length=3)
+    currency: str = Field(min_length=3, max_length=3, pattern=r"^[A-Z]{3}$")
     method: str = Field(default="haulpave-economics-v1", description="Calculation method ID")

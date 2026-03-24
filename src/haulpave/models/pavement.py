@@ -58,11 +58,19 @@ class DesignResult(BaseModel):
     )
 
     # Versioning / audit fields
-    method_id: str = Field(description="Calculation method identifier, e.g. 'USACE-TM5-822-12'")
-    package_version: str = Field(description="haulpave package version that produced this result")
+    method_id: str = Field(
+        min_length=1,
+        description="Calculation method identifier, e.g. 'USACE-TM5-822-12'",
+    )
+    package_version: str = Field(
+        min_length=1,
+        description="haulpave package version that produced this result",
+    )
     curve_version: str | None = Field(
         default=None, description="Curve digitization version, if applicable"
     )
     input_hash: str | None = Field(
-        default=None, description="SHA-256 hex digest of serialised inputs"
+        default=None,
+        pattern=r"^[a-fA-F0-9]{64}$",
+        description="SHA-256 hex digest of serialised inputs",
     )
