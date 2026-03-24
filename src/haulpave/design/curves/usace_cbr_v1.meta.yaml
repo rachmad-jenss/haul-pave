@@ -11,5 +11,6 @@ notes: >
   Thickness represents total required pavement thickness above subgrade (surfacing + base + subbase).
   CBR values are in-situ subgrade CBR (%).
   Design coverages represent equivalent design wheel load passes.
-  For CBR < 2 or CBR > 100, extrapolation is not recommended — use boundary values.
+  For CBR < 2 or CBR > 100, interpolation raises ValueError — inputs must be within range.
+  For design coverages outside the range [10, 100000], values are clamped to the boundary.
 license: "Source document in public domain (US Government publication)"

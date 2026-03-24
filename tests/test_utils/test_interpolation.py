@@ -4,13 +4,47 @@ from __future__ import annotations
 
 import pytest
 
-from haulpave.utils.interpolation import interpolate_thickness, load_curve_data
+from haulpave.utils.interpolation import (
+    _validate_curve_data,
+    interpolate_thickness,
+    load_curve_data,
+)
 
 
 @pytest.fixture(scope="module")
 def curve_data() -> dict:  # type: ignore[type-arg]
     """Load USACE CBR curve data once for all tests."""
     return load_curve_data("usace_cbr_v1")
+
+
+class TestValidateCurveData:
+    def test_raises_on_missing_keys(self) -> None:
+        """Missing required keys raises ValueError."""
+        with pytest.raises(ValueError, match="missing required keys"):
+            _validate_curve_data({"cbr_values": [1, 2]})
+
+    def test_raises_on_length_mismatch(self) -> None:
+        """thickness_mm array length mismatch raises ValueError."""
+        bad_data: dict = {
+            "cbr_values": [2, 10, 100],
+            "coverage_levels": [100, 1000],
+            "thickness_mm": {
+                "100": [600, 400],  # only 2 values, needs 3
+                "1000": [700, 500],  # only 2 values, needs 3
+            },
+        }
+        with pytest.raises(ValueError, match="thickness_mm"):
+            _validate_curve_data(bad_data)
+
+    def test_raises_on_missing_coverage_key(self) -> None:
+        """Missing coverage key in thickness_mm raises ValueError."""
+        bad_data: dict = {
+            "cbr_values": [2, 100],
+            "coverage_levels": [100, 1000],
+            "thickness_mm": {"100": [600, 150]},  # missing "1000"
+        }
+        with pytest.raises(ValueError, match="missing coverage level key"):
+            _validate_curve_data(bad_data)
 
 
 class TestLoadCurveData:
@@ -107,3 +141,21 @@ class TestInterpolateThickness:
         """Negative coverages raises ValueError."""
         with pytest.raises(ValueError, match="coverages"):
             interpolate_thickness(curve_data, cbr=10, coverages=-1)
+
+    def test_coverages_below_min_clamps_to_min_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
+        """Coverages below curve minimum are clamped to minimum coverage level (10)."""
+        result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1)
+        result_min = interpolate_thickness(curve_data, cbr=10, coverages=10)
+        assert result_clamped == result_min, (
+            f"Expected coverages=1 to clamp to coverages=10: "
+            f"got {result_clamped:.1f} vs {result_min:.1f} mm"
+        )
+
+    def test_coverages_above_max_clamps_to_max_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
+        """Coverages above curve maximum are clamped to maximum coverage level (100000)."""
+        result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
+        result_max = interpolate_thickness(curve_data, cbr=10, coverages=100_000)
+        assert result_clamped == result_max, (
+            f"Expected coverages=1_000_000 to clamp to coverages=100_000: "
+            f"got {result_clamped:.1f} vs {result_max:.1f} mm"
+        )
