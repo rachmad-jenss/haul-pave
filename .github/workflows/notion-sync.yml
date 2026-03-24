@@ -13,7 +13,6 @@ jobs:
         uses: actions/github-script@v7
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          # Tasks database ID from Dash HQ > Product Ops > Tasks
           NOTION_TASKS_DB: ${{ secrets.NOTION_TASKS_DB }}
         with:
           script: |
