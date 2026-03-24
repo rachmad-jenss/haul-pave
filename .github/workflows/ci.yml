@@ -48,7 +48,9 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/
       - name: Run benchmark tests
-        run: pytest tests/benchmarks/ -v --tb=long
+        # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
+        # Any other non-zero exit code (1 = test failure) is a real error.
+        run: pytest tests/benchmarks/ -v --tb=long --no-cov || [ $? -eq 5 ]
 
   docs:
     runs-on: ubuntu-latest

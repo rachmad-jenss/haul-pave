@@ -1,0 +1,36 @@
+site_name: HaulPave
+site_description: Open-source pavement structure and operating-cost analysis for mine haul roads
+site_url: https://rachmad-jenss.github.io/haul-pave/
+repo_url: https://github.com/rachmad-jenss/haul-pave
+repo_name: rachmad-jenss/haul-pave
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - search.highlight
+
+nav:
+  - Home: index.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
