@@ -73,7 +73,9 @@ ignore_missing_imports = true
 # ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=haulpave --cov-report=term-missing --cov-fail-under=85"
+# Coverage flags are passed explicitly in CI (see .github/workflows/ci.yml).
+# This prevents addopts from applying --cov-fail-under to benchmark-only runs
+# (which collect 0 items and have no coverage data, causing a spurious failure).
 
 [tool.coverage.run]
 source = ["haulpave"]
