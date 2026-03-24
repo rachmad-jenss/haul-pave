@@ -20,8 +20,12 @@ for the current phase and planned releases.
 
 ## Installation
 
+HaulPave is not yet published to PyPI. Install from source:
+
 ```bash
-pip install haulpave
+git clone https://github.com/rachmad-jenss/haul-pave.git
+cd haul-pave
+pip install -e .
 ```
 
 ## Scope
