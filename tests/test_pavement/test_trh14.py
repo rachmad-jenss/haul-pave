@@ -69,23 +69,23 @@ class TestCbrToMaterialClass:
         "cbr,expected",
         [
             (95.0, "G1"),
-            (80.0, "G1"),   # lower boundary G1
+            (80.0, "G1"),  # lower boundary G1
             (79.9, "G2"),
-            (45.0, "G2"),   # lower boundary G2
+            (45.0, "G2"),  # lower boundary G2
             (44.9, "G3"),
-            (25.0, "G3"),   # lower boundary G3
+            (25.0, "G3"),  # lower boundary G3
             (24.9, "G4"),
-            (15.0, "G4"),   # lower boundary G4
+            (15.0, "G4"),  # lower boundary G4
             (14.9, "G5"),
-            (7.0,  "G5"),   # lower boundary G5
-            (6.9,  "G6"),
-            (4.0,  "G6"),   # lower boundary G6
-            (3.9,  "G7"),
-            (2.0,  "G7"),   # lower boundary G7
-            (1.9,  "G8"),
-            (1.5,  "G8"),   # lower boundary G8
-            (1.4,  "G9"),
-            (0.0,  "G9"),
+            (7.0, "G5"),  # lower boundary G5
+            (6.9, "G6"),
+            (4.0, "G6"),  # lower boundary G6
+            (3.9, "G7"),
+            (2.0, "G7"),  # lower boundary G7
+            (1.9, "G8"),
+            (1.5, "G8"),  # lower boundary G8
+            (1.4, "G9"),
+            (0.0, "G9"),
         ],
     )
     def test_boundary(self, cbr: float, expected: str) -> None:
@@ -134,9 +134,7 @@ class TestComputeTrh14GClass:
         "cbr,expected_class",
         [(5.0, "G6"), (12.0, "G5"), (20.0, "G4"), (35.0, "G3")],
     )
-    def test_g_class_correct(
-        self, fleet_d: TrafficInput, cbr: float, expected_class: str
-    ) -> None:
+    def test_g_class_correct(self, fleet_d: TrafficInput, cbr: float, expected_class: str) -> None:
         result = compute_trh14(fleet_d, subgrade_cbr=cbr)
         assert result.material_class == expected_class
 
