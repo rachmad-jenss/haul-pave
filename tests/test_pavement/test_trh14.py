@@ -184,15 +184,16 @@ class TestComputeTrh14CoverageClamping:
             axle_groups=[_single(80.0)],
             source="test",
         )
-        # 1 trip/day, 1 year, 100 days → very few coverages
+        # 1 trip/day, 1 year, 10 days → very few coverages
         traffic_low = TrafficInput(
             fleet=[FleetUnit(vehicle=truck, trips_per_day=1)],
             design_life_years=1,
             working_days_per_year=10,
         )
-        # Should not raise — coverages are clamped to catalog minimum
+        # Should not raise — coverages are clamped to catalog minimum (100)
         result = compute_trh14(traffic_low, subgrade_cbr=10.0)
-        assert result.total_thickness_mm > 0
+        assert result.total_coverages < 100  # confirms input is below catalog min
+        assert result.total_thickness_mm == pytest.approx(150.0, abs=1e-6)  # G5 @ min knot
 
     def test_very_high_coverages_clamped(self) -> None:
         """Extremely heavy traffic → coverages above catalog maximum, clamped downward."""
@@ -208,7 +209,8 @@ class TestComputeTrh14CoverageClamping:
             working_days_per_year=365,
         )
         result = compute_trh14(traffic_heavy, subgrade_cbr=10.0)
-        assert result.total_thickness_mm > 0
+        assert result.total_coverages > 1_000_000  # confirms input is above catalog max
+        assert result.total_thickness_mm == pytest.approx(600.0, abs=1e-6)  # G5 @ max knot
 
 
 # ---------------------------------------------------------------------------

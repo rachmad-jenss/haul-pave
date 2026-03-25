@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -83,8 +84,9 @@ def cbr_to_material_class(cbr: float) -> str:
     return "G9"  # pragma: no cover — G9 bound=0.0 catches all remaining values
 
 
+@lru_cache(maxsize=1)
 def _load_catalog() -> dict[str, Any]:
-    """Load TRH 14 design catalog JSON."""
+    """Load TRH 14 design catalog JSON (cached per process)."""
     with _CATALOG_PATH.open(encoding="utf-8") as fh:
         return json.load(fh)  # type: ignore[no-any-return]
 
@@ -112,7 +114,19 @@ def _interpolate_catalog(
     -------
     float
         Interpolated total pavement thickness [mm].
+
+    Raises
+    ------
+    ValueError
+        If vectors are empty or their lengths do not match.
     """
+    if not coverage_levels or not thickness_values:
+        raise ValueError("coverage_levels and thickness_values must be non-empty")
+    if len(thickness_values) != len(coverage_levels):
+        raise ValueError(
+            "Catalog shape mismatch: len(thickness_values) must equal len(coverage_levels)"
+        )
+
     cov_clamped = max(float(coverage_levels[0]), min(float(coverage_levels[-1]), coverages))
     log_cov = math.log10(cov_clamped)
     log_levels = [math.log10(float(c)) for c in coverage_levels]
