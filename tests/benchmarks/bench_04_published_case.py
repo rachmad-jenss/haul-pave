@@ -77,14 +77,14 @@ _REF = json.loads(
 )
 
 _TOL = _REF["metadata"]["tolerances"]
-CESA_TOLERANCE = _TOL["cesa_pct"] / 100.0          # 1 %  → 0.01
+CESA_TOLERANCE = _TOL["cesa_pct"] / 100.0  # 1 %  → 0.01
 COVERAGES_TOLERANCE = _TOL["coverages_pct"] / 100.0  # 2 %  → 0.02
-THICKNESS_TOLERANCE_MM = _TOL["thickness_mm"]        # 5 mm absolute
+THICKNESS_TOLERANCE_MM = _TOL["thickness_mm"]  # 5 mm absolute
 
 CASE = _REF["case"]
-DESIGN_LIFE = CASE["design_life_years"]              # 10
-WORKING_DAYS = CASE["operating_days_per_year"]       # 350
-SUBGRADE_CBR = CASE["subgrade_cbr"]                  # 7
+DESIGN_LIFE = CASE["design_life_years"]  # 10
+WORKING_DAYS = CASE["operating_days_per_year"]  # 350
+SUBGRADE_CBR = CASE["subgrade_cbr"]  # 7
 
 # ---------------------------------------------------------------------------
 # Fleet B fixtures — identical to bench_01 / bench_02 Fleet B
@@ -137,7 +137,7 @@ def fleet_b_input() -> TrafficInput:
         name="CAT 785D",
         gross_vehicle_mass_t=269.0,
         axle_groups=[
-            _single(225.0),   # front single axle: 225 kN
+            _single(225.0),  # front single axle: 225 kN
             _tandem(1040.0),  # rear tandem group: 1040 kN
         ],
         source="Caterpillar 785D Specifications, CAT Performance Handbook Ed. 47",
@@ -146,7 +146,7 @@ def fleet_b_input() -> TrafficInput:
         name="Motor Grader (25 t)",
         gross_vehicle_mass_t=25.0,
         axle_groups=[
-            _single(85.0),   # front single axle: 85 kN
+            _single(85.0),  # front single axle: 85 kN
             _tandem(160.0),  # rear tandem group: 160 kN (= standard tandem → LEF 2.0)
         ],
         source="Generic motor grader — conservative estimate based on GVM",
