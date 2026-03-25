@@ -71,9 +71,9 @@ pytest.importorskip(
 # Reference data
 # ---------------------------------------------------------------------------
 _REF = json.loads(
-    (
-        pathlib.Path(__file__).parent / "reference_data" / "bench_03_expected.json"
-    ).read_text(encoding="utf-8")
+    (pathlib.Path(__file__).parent / "reference_data" / "bench_03_expected.json").read_text(
+        encoding="utf-8"
+    )
 )
 
 TOLERANCE_MM: float = _REF["metadata"]["tolerance_mm"]  # 5.0 mm
