@@ -26,7 +26,7 @@ from haulpave.traffic.cesa import compute_cesa
 from haulpave.traffic.coverages import compute_coverages
 from haulpave.utils.interpolation import interpolate_thickness, load_curve_data
 
-__all__ = ["PavementResult", "design_pavement"]
+__all__ = ["ComparisonResult", "PavementResult", "compare_methods", "design_pavement"]
 
 
 @dataclass(frozen=True)
@@ -110,3 +110,8 @@ def design_pavement(
         required_thickness_mm=thickness,
         design_wheel_load_kn=cov_result.design_wheel_load_kn,
     )
+
+
+# Bottom import — avoids circular dependency: compare.py imports PavementResult
+# and design_pavement from this module (already defined above by this point).
+from haulpave.pavement.compare import ComparisonResult, compare_methods  # noqa: E402
