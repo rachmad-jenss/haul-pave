@@ -198,6 +198,13 @@ def _assert_thickness(computed: float, expected: float, label: str) -> None:
 
 def _assert_coverages(computed: float, expected: float, label: str) -> None:
     """Assert computed coverages is within COVERAGES_TOLERANCE of reference."""
+    if expected == 0:
+        abs_err = abs(computed)
+        assert abs_err <= COVERAGES_TOLERANCE, (
+            f"{label}: computed={computed:.2f}, expected=0, "
+            f"absolute error={abs_err:.4f} (tolerance={COVERAGES_TOLERANCE:.2%})"
+        )
+        return
     rel_err = abs(computed - expected) / expected
     assert rel_err <= COVERAGES_TOLERANCE, (
         f"{label}: computed={computed:.2f}, expected={expected:.2f}, "
