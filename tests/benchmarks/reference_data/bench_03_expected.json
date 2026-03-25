@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "source": "USACE TM 5-822-12, Figure 1 — CBR Design Curves for aggregate-surfaced roads",
+    "curve_id": "usace_cbr_v1",
+    "method": "PCHIP interpolation from digitized curve data",
+    "tolerance_mm": 5.0,
+    "computed_by": "haulpave.utils.interpolation.interpolate_thickness",
+    "notes": "Expected values are computed directly from the digitized USACE TM 5-822-12 Figure 1 curve data (usace_cbr_v1.json) using PCHIP interpolation. This IS the hand-read: since the digitized curve is the reference, calling the interpolation utility with known inputs is equivalent to reading the chart by hand."
+  },
+  "cases": [
+    {
+      "id": "case_a",
+      "description": "Soft subgrade, moderate traffic — CBR=3 at 1000 coverages",
+      "cbr": 3,
+      "coverages": 1000,
+      "expected_thickness_mm": 623.0
+    },
+    {
+      "id": "case_b",
+      "description": "Medium subgrade, high traffic — CBR=7 at 5000 coverages",
+      "cbr": 7,
+      "coverages": 5000,
+      "expected_thickness_mm": 502.23
+    },
+    {
+      "id": "case_c",
+      "description": "Firm subgrade, very high traffic — CBR=15 at 50000 coverages",
+      "cbr": 15,
+      "coverages": 50000,
+      "expected_thickness_mm": 419.0
+    }
+  ]
+}
