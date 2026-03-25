@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "benchmark_id": "bench_01",
+    "method": "AASHTO 4th power law CESA",
+    "source": "AASHTO (1993) Guide for Design of Pavement Structures, 4th edition",
+    "design_life_years": 10,
+    "working_days_per_year": 350,
+    "standard_single_axle_kN": 80.0,
+    "standard_tandem_axle_kN": 160.0,
+    "tolerance_pct": 1.0,
+    "calculated_date": "2026-03-24"
+  },
+  "fleets": {
+    "fleet_a_light": {
+      "total_cesa": 181384137.04,
+      "vehicles": {
+        "cat_777g": {
+          "front_axle_lef": 14.0918,
+          "rear_tandem_lef": 1018.1328,
+          "total_lef_per_trip": 1032.2246,
+          "trips_per_day": 50,
+          "cesa_contribution": 180639309.31
+        },
+        "water_truck": {
+          "front_axle_lef": 5.0625,
+          "rear_tandem_lef": 16.2183,
+          "total_lef_per_trip": 21.2808,
+          "trips_per_day": 10,
+          "cesa_contribution": 744827.73
+        }
+      }
+    },
+    "fleet_b_medium": {
+      "total_cesa": 508634682.58,
+      "vehicles": {
+        "cat_785d": {
+          "front_axle_lef": 62.5706,
+          "rear_tandem_lef": 3570.1250,
+          "total_lef_per_trip": 3632.6956,
+          "trips_per_day": 40,
+          "cesa_contribution": 508577380.07
+        },
+        "motor_grader": {
+          "front_axle_lef": 1.2744,
+          "rear_tandem_lef": 2.0000,
+          "total_lef_per_trip": 3.2744,
+          "trips_per_day": 5,
+          "cesa_contribution": 57302.51
+        }
+      }
+    },
+    "fleet_c_heavy": {
+      "total_cesa": 4410894012.45,
+      "vehicles": {
+        "cat_793f": {
+          "front_axle_lef": 2234.0393,
+          "rear_tandem_lef": 39770.8130,
+          "total_lef_per_trip": 42004.8523,
+          "trips_per_day": 30,
+          "cesa_contribution": 4410509490.97
+        },
+        "fuel_truck": {
+          "front_axle_lef": 2.4414,
+          "rear_tandem_lef": 4.8828,
+          "total_lef_per_trip": 7.3242,
+          "trips_per_day": 15,
+          "cesa_contribution": 384521.48
+        }
+      }
+    }
+  }
+}
