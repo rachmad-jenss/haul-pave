@@ -1,0 +1,133 @@
+{
+  "metadata": {
+    "benchmark_id": "bench_05",
+    "title": "TRH 14 hand-calc — CBR-to-material-class mapping and thickness design",
+    "method": "TRH 14 (CSRA 1985) design catalog for unpaved haul roads",
+    "description": "Validates the TRH 14 pavement design method: CBR classification into G1-G9 material classes (TRH 14 Table 2) and total pavement thickness from the TRH 14 design catalog (log-linear interpolation on design coverages). Traffic loadings use the USACE TM 5-822-12 design-coverages method (bench_02).",
+    "sources": [
+      "CSRA (1985). Technical Recommendations for Highways 14 (TRH 14): Guidelines for Road Construction Materials. Committee of State Road Authorities, Pretoria.",
+      "Thompson, R.J. and Visser, A.T. (2006). 'The Functional Design of Surface Mine Haul Roads.' Journal of the South African Institute of Mining and Metallurgy, vol. 106, pp. 29-36.",
+      "SABITA (Southern African Bitumen Association). Bituminous Surfacing Design Criteria. Manual 18.",
+      "USACE TM 5-822-12 (1990). Flexible Pavement Design for Airfields — design-coverages method."
+    ],
+    "calculated_date": "2026-03-25",
+    "catalog_version": "trh14_catalog_v1",
+    "tolerances": {
+      "g_class_exact": true,
+      "coverages_pct": 0.1,
+      "thickness_mm": 25.0
+    },
+    "notes": [
+      "G-class mapping boundaries are inclusive on the lower bound (e.g. CBR=7 → G5, not G6).",
+      "Design catalog thickness values are from Thompson & Visser (2006) Table 3 adapted for unpaved haul roads.",
+      "Log-linear interpolation is applied between coverage knot points.",
+      "Tolerance of ±25 mm reflects graphical chart reading accuracy and field construction precision.",
+      "Fleet D (single 100t haul truck, 25 trips/day) produces 75.0 equiv_passes/day.",
+      "Total coverages = 75.0 × 300 days/year × 3 years = 67,500."
+    ]
+  },
+  "fleet": {
+    "fleet_id": "fleet_d_single_100t",
+    "description": "Single-vehicle fleet — generic 100t haul truck",
+    "vehicles": [
+      {
+        "name": "Generic 100t Haul Truck",
+        "gross_vehicle_mass_t": 100.0,
+        "trips_per_day": 25,
+        "front_axle_load_kN": 130.0,
+        "front_axle_n": 1,
+        "front_tyres_per_axle": 2,
+        "rear_tandem_load_kN": 520.0,
+        "rear_axle_n": 2,
+        "rear_tyres_per_axle": 4
+      }
+    ],
+    "design_life_years": 3,
+    "working_days_per_year": 300
+  },
+  "hand_calc": {
+    "design_wheel_load_kn": 65.0,
+    "steps": {
+      "front_wheel_load": "130.0 / 2 = 65.0 kN (single axle, n=1, 2 tyres)",
+      "rear_wheel_load": "520.0 / (2 × 2 × 4) = 32.5 kN (tandem, n=2, 4 tyres/axle, dual-tyre stations: total tyre count = 16)",
+      "design_wheel_load": "max(65.0, 32.5) = 65.0 kN — governed by front single axle",
+      "front_positions": 1,
+      "rear_positions": "2 × 4 = 8 (dual-tyre stations for tandem group)",
+      "front_ratio_4th_power": "(65.0 / 65.0)^4 = 1.0^4 = 1.000000",
+      "rear_ratio_4th_power": "(32.5 / 65.0)^4 = 0.5^4 = 0.062500",
+      "front_equiv_passes_per_day": "25 trips × 2 directions × 1 position × 1.000000 = 50.000 equiv_passes/day",
+      "rear_equiv_passes_per_day": "25 trips × 2 directions × 8 positions × 0.062500 = 25.000 equiv_passes/day",
+      "total_equiv_passes_per_day": "50.000 + 25.000 = 75.000",
+      "total_coverages": "75.000 × 300 days/year × 3 years = 67,500"
+    },
+    "expected_coverages": 67500.0
+  },
+  "cbr_to_material_class_cases": [
+    {"cbr": 0.8,  "expected": "G9", "note": "CBR < 1.5 → G9"},
+    {"cbr": 1.0,  "expected": "G9", "note": "CBR < 1.5 → G9"},
+    {"cbr": 1.5,  "expected": "G8", "note": "1.5 ≤ CBR < 2 → G8 (lower boundary)"},
+    {"cbr": 1.8,  "expected": "G8", "note": "1.5 ≤ CBR < 2 → G8"},
+    {"cbr": 2.0,  "expected": "G7", "note": "2 ≤ CBR < 4 → G7 (lower boundary)"},
+    {"cbr": 3.0,  "expected": "G7", "note": "2 ≤ CBR < 4 → G7"},
+    {"cbr": 4.0,  "expected": "G6", "note": "4 ≤ CBR < 7 → G6 (lower boundary)"},
+    {"cbr": 5.0,  "expected": "G6", "note": "4 ≤ CBR < 7 → G6"},
+    {"cbr": 7.0,  "expected": "G5", "note": "7 ≤ CBR < 15 → G5 (lower boundary)"},
+    {"cbr": 10.0, "expected": "G5", "note": "7 ≤ CBR < 15 → G5"},
+    {"cbr": 12.0, "expected": "G5", "note": "7 ≤ CBR < 15 → G5"},
+    {"cbr": 15.0, "expected": "G4", "note": "15 ≤ CBR < 25 → G4 (lower boundary)"},
+    {"cbr": 20.0, "expected": "G4", "note": "15 ≤ CBR < 25 → G4"},
+    {"cbr": 25.0, "expected": "G3", "note": "25 ≤ CBR < 45 → G3 (lower boundary)"},
+    {"cbr": 35.0, "expected": "G3", "note": "25 ≤ CBR < 45 → G3"},
+    {"cbr": 45.0, "expected": "G2", "note": "45 ≤ CBR < 80 → G2 (lower boundary)"},
+    {"cbr": 60.0, "expected": "G2", "note": "45 ≤ CBR < 80 → G2"},
+    {"cbr": 80.0, "expected": "G1", "note": "CBR ≥ 80 → G1 (lower boundary)"},
+    {"cbr": 95.0, "expected": "G1", "note": "CBR ≥ 80 → G1"}
+  ],
+  "thickness_cases": [
+    {
+      "id": "case_a_g6",
+      "description": "Fleet D, subgrade CBR=5% (G6), 67,500 design coverages — log-linear between 10,000 and 100,000",
+      "subgrade_cbr": 5.0,
+      "expected_g_class": "G6",
+      "expected_coverages": 67500.0,
+      "expected_total_thickness_mm": 549.4,
+      "hand_calc_steps": {
+        "g_class": "CBR=5% → G6 (4 ≤ CBR < 7)",
+        "lower_knot": {"coverages": 10000, "thickness_mm": 425},
+        "upper_knot": {"coverages": 100000, "thickness_mm": 575},
+        "log_fraction": "log10(67500 / 10000) / log10(100000 / 10000) = log10(6.75) / log10(10) = 0.82930 / 1.0 = 0.82930",
+        "interpolated": "425 + 0.82930 × (575 − 425) = 425 + 0.82930 × 150 = 425 + 124.40 = 549.4 mm"
+      }
+    },
+    {
+      "id": "case_b_g5",
+      "description": "Fleet D, subgrade CBR=12% (G5), 67,500 design coverages — log-linear between 10,000 and 100,000",
+      "subgrade_cbr": 12.0,
+      "expected_g_class": "G5",
+      "expected_coverages": 67500.0,
+      "expected_total_thickness_mm": 428.7,
+      "hand_calc_steps": {
+        "g_class": "CBR=12% → G5 (7 ≤ CBR < 15)",
+        "lower_knot": {"coverages": 10000, "thickness_mm": 325},
+        "upper_knot": {"coverages": 100000, "thickness_mm": 450},
+        "log_fraction": "log10(67500 / 10000) / log10(100000 / 10000) = 0.82930",
+        "interpolated": "325 + 0.82930 × (450 − 325) = 325 + 0.82930 × 125 = 325 + 103.66 = 428.7 mm"
+      }
+    },
+    {
+      "id": "case_c_g4",
+      "description": "Fleet D, subgrade CBR=20% (G4), 67,500 design coverages — log-linear between 10,000 and 100,000",
+      "subgrade_cbr": 20.0,
+      "expected_g_class": "G4",
+      "expected_coverages": 67500.0,
+      "expected_total_thickness_mm": 287.2,
+      "hand_calc_steps": {
+        "g_class": "CBR=20% → G4 (15 ≤ CBR < 25)",
+        "lower_knot": {"coverages": 10000, "thickness_mm": 225},
+        "upper_knot": {"coverages": 100000, "thickness_mm": 300},
+        "log_fraction": "log10(67500 / 10000) / log10(100000 / 10000) = 0.82930",
+        "interpolated": "225 + 0.82930 × (300 − 225) = 225 + 0.82930 × 75 = 225 + 62.20 = 287.2 mm"
+      }
+    }
+  ]
+}
