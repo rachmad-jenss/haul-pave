@@ -22,8 +22,8 @@ All curve data files must comply with the **Curve Encoding Policy** documented i
 
 | File | Status | Source | Implemented |
 |------|--------|--------|-------------|
-| `usace_cbr_v1.json` | Planned | USACE TM 5-822-12 | DAS-103 |
-| `usace_cbr_v1.meta.yaml` | Planned | USACE TM 5-822-12 | DAS-103 |
+| `usace_cbr_v1.json` | Implemented | USACE TM 5-822-12, Fig. 1 | DAS-103 |
+| `usace_cbr_v1.meta.yaml` | Implemented | USACE TM 5-822-12, Fig. 1 | DAS-103 |
 
 ## Adding New Curves
 
