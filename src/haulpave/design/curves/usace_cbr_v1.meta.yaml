@@ -1,0 +1,16 @@
+curve_id: usace_cbr_v1
+version: "1"
+source_document: "USACE TM 5-822-12: Flexible Pavement Design for Airfields (Unified Facilities Criteria)"
+figure: "Figure 1 — Design curves for flexible pavement, aggregate-surfaced roads"
+digitization_method: "Manual point extraction from published figure, interpolated at standard CBR knot points"
+digitization_date: "2026-03-24"
+digitized_by: "HaulPave project team"
+tolerance_mm: 5
+notes: >
+  Values are representative digitizations of the published USACE curves.
+  Thickness represents total required pavement thickness above subgrade (surfacing + base + subbase).
+  CBR values are in-situ subgrade CBR (%).
+  Design coverages represent equivalent design wheel load passes.
+  For CBR < 2 or CBR > 100, interpolation raises ValueError — inputs must be within range.
+  For design coverages outside the range [10, 100000], values are clamped to the boundary.
+license: "Source document in public domain (US Government publication)"
