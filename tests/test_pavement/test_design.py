@@ -289,9 +289,7 @@ class TestDesignPavement:
         cesa_direct = compute_cesa(fleet_b_traffic)
         assert result.total_cesa == pytest.approx(cesa_direct.total_cesa, rel=1e-9)
 
-    def test_coverages_consistent_with_traffic_module(
-        self, fleet_b_traffic: TrafficInput
-    ) -> None:
+    def test_coverages_consistent_with_traffic_module(self, fleet_b_traffic: TrafficInput) -> None:
         """design_pavement coverages must match compute_coverages() called independently."""
         from haulpave.traffic.coverages import compute_coverages
 
