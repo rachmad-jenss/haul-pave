@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "benchmark_id": "bench_02",
+    "method": "USACE TM 5-822-12 design coverages",
+    "source": "USACE TM 5-822-12, Flexible Pavement Design for Airfields, para 3-2",
+    "design_life_years": 10,
+    "working_days_per_year": 350,
+    "tolerance_pct": 2.0,
+    "calculated_date": "2026-03-24",
+    "notes": [
+      "Design vehicle = heaviest single wheel load in fleet.",
+      "Coverage weighting: (wheel_load / design_wheel_load)^4 per wheel position per pass.",
+      "Front axle counted as 1 wheel position; rear tandem counted as axle_count * tyres_per_axle positions.",
+      "Both directions counted: total daily passes = trips_per_day * 2.",
+      "Total coverages = sum_of_equiv_passes_per_day * working_days * design_life."
+    ]
+  },
+  "fleets": {
+    "fleet_a_light": {
+      "design_wheel_load_kN": 77.5,
+      "total_coverages": 771523.33,
+      "vehicles": {
+        "cat_777g": {
+          "front_wheel_load_kN": 77.5,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 47.5,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 50,
+          "equiv_passes_per_day": 212.8906
+        },
+        "water_truck": {
+          "front_wheel_load_kN": 60.0,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 16.875,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 10,
+          "equiv_passes_per_day": 7.5447
+        }
+      }
+    },
+    "fleet_b_medium": {
+      "design_wheel_load_kN": 112.5,
+      "total_coverages": 530357.24,
+      "vehicles": {
+        "cat_785d": {
+          "front_wheel_load_kN": 112.5,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 65.0,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 40,
+          "equiv_passes_per_day": 151.3220
+        },
+        "motor_grader": {
+          "front_wheel_load_kN": 42.5,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 10.0,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 5,
+          "equiv_passes_per_day": 0.2087
+        }
+      }
+    },
+    "fleet_c_heavy": {
+      "design_wheel_load_kN": 275.0,
+      "total_coverages": 268531.80,
+      "vehicles": {
+        "cat_793f": {
+          "front_wheel_load_kN": 275.0,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 118.75,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 30,
+          "equiv_passes_per_day": 76.6896
+        },
+        "fuel_truck": {
+          "front_wheel_load_kN": 50.0,
+          "front_wheel_positions": 1,
+          "rear_wheel_load_kN": 12.5,
+          "rear_wheel_positions": 8,
+          "trips_per_day": 15,
+          "equiv_passes_per_day": 0.0338
+        }
+      }
+    }
+  }
+}
