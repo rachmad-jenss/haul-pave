@@ -179,9 +179,7 @@ def compute_coverages(traffic: TrafficInput) -> CoveragesResult:
         )
 
     total_coverages = (
-        total_equiv_passes_per_day
-        * traffic.working_days_per_year
-        * traffic.design_life_years
+        total_equiv_passes_per_day * traffic.working_days_per_year * traffic.design_life_years
     )
 
     return CoveragesResult(
