@@ -240,9 +240,7 @@ class TestMultiVehicleFleet:
 
         r1 = compute_cesa(_make_traffic(v1, trips=10))
         r2 = compute_cesa(_make_traffic(v2, trips=5))
-        assert math.isclose(
-            r_combined.total_cesa, r1.total_cesa + r2.total_cesa, rel_tol=1e-9
-        )
+        assert math.isclose(r_combined.total_cesa, r1.total_cesa + r2.total_cesa, rel_tol=1e-9)
 
     def test_fleet_ordering_does_not_matter(self) -> None:
         """CESA must be the same regardless of FleetUnit order."""
@@ -286,9 +284,7 @@ class TestMultiAxleVehicle:
         r_combined = compute_cesa(_make_traffic(v_combined, trips=10))
         r_s = compute_cesa(_make_traffic(v_single_only, trips=10))
         r_t = compute_cesa(_make_traffic(v_tandem_only, trips=10))
-        assert math.isclose(
-            r_combined.total_cesa, r_s.total_cesa + r_t.total_cesa, rel_tol=1e-9
-        )
+        assert math.isclose(r_combined.total_cesa, r_s.total_cesa + r_t.total_cesa, rel_tol=1e-9)
 
     def test_three_axle_groups(self) -> None:
         """A vehicle with three axle groups must compute a positive CESA."""
