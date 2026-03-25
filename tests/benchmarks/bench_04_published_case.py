@@ -119,42 +119,47 @@ def _tandem(load_kn: float) -> AxleGroup:
 def fleet_b_input() -> TrafficInput:
     """Fleet B — Medium: CAT 785D + Motor Grader.
 
-    Axle loads
+    Axle loads (per USACE dual-tyre convention: tandem = 2 axles × 4 tyres/axle = 8 tyre
+    positions; single-wheel load = group_load / (axle_count × 2 × tyres_per_axle) = 16 tyres)
     ----------
     CAT 785D (GVM 269 t, 40 trips/day):
-      Front single axle: 225 kN  → 112.5 kN/wheel (2 tyres)
-      Rear tandem group: 1040 kN → 65.0 kN/wheel (16 tyres)
+      Front single axle: 225 kN  → 112.5 kN/wheel (2 physical tyres, 1 position)
+      Rear tandem group: 1040 kN → 65.0 kN/tyre (axle_count × 2 × tyres_per_axle = 16 tyres,
+                                    8 dual-tyre positions for USACE coverage weighting)
 
     Motor Grader (GVM 25 t, 5 trips/day):
-      Front single axle: 85 kN   → 42.5 kN/wheel
-      Rear tandem group: 160 kN  → 10.0 kN/wheel (standard tandem, LEF=2.0)
+      Front single axle: 85 kN   → 42.5 kN/wheel (1 position)
+      Rear tandem group: 160 kN  → 10.0 kN/tyre (= 16 tyres; standard tandem → LEF 2.0)
 
-    This composition is identical to bench_01 and bench_02 Fleet B fixtures.
-    Source: Caterpillar 785D Specifications, CAT Performance Handbook Ed. 47;
-            Generic motor grader — conservative GVM estimate.
+    Values are wired directly from bench_04_expected.json (CASE["fleet_composition"])
+    to keep the JSON as the single source of truth. This composition is identical
+    to bench_01 and bench_02 Fleet B fixtures.
     """
+    cat_ref = CASE["fleet_composition"]["cat_785d"]
+    grader_ref = CASE["fleet_composition"]["motor_grader"]
+
     cat_785d = MiningVehicle(
         name="CAT 785D",
-        gross_vehicle_mass_t=269.0,
+        gross_vehicle_mass_t=cat_ref["gross_vehicle_mass_t"],
         axle_groups=[
-            _single(225.0),  # front single axle: 225 kN
-            _tandem(1040.0),  # rear tandem group: 1040 kN
+            _single(cat_ref["front_axle_load_kN"]),
+            _tandem(cat_ref["rear_tandem_load_kN"]),
         ],
         source="Caterpillar 785D Specifications, CAT Performance Handbook Ed. 47",
     )
     motor_grader = MiningVehicle(
         name="Motor Grader (25 t)",
-        gross_vehicle_mass_t=25.0,
+        gross_vehicle_mass_t=grader_ref["gross_vehicle_mass_t"],
         axle_groups=[
-            _single(85.0),  # front single axle: 85 kN
-            _tandem(160.0),  # rear tandem group: 160 kN (= standard tandem → LEF 2.0)
+            _single(grader_ref["front_axle_load_kN"]),
+            _tandem(grader_ref["rear_tandem_load_kN"]),
         ],
         source="Generic motor grader — conservative estimate based on GVM",
     )
     return TrafficInput(
         fleet=[
-            FleetUnit(vehicle=cat_785d, trips_per_day=40),
-            FleetUnit(vehicle=motor_grader, trips_per_day=5),
+            FleetUnit(vehicle=cat_785d, trips_per_day=cat_ref["trips_per_day"]),
+            FleetUnit(vehicle=motor_grader, trips_per_day=grader_ref["trips_per_day"]),
         ],
         design_life_years=DESIGN_LIFE,
         working_days_per_year=WORKING_DAYS,
