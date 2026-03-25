@@ -21,8 +21,8 @@ HaulPave uses [Semantic Versioning](https://semver.org/).
 - Phase 1: Pavement design engine — `haulpave.pavement.design_pavement` CBR thickness (DAS-108)
 
 ### Technical
-- All 4 benchmark test files pass with no skips
-- 144 unit tests, 98.5% coverage
+- All 4 benchmark test files pass with no skips (as of 2026-03-25)
+- 144 unit tests, 98.5% coverage (as of 2026-03-25)
 - Python 3.10+ compatible, tested on 3.10, 3.11, 3.12
 - SI units throughout (mm, kN, tonnes)
 - Confidence labels: all engines are `benchmark_tested`
