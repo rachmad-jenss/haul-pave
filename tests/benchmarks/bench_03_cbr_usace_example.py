@@ -106,11 +106,7 @@ _CASES = {c["id"]: c for c in _REF["cases"]}
 
 @pytest.mark.parametrize(
     "case_id,cbr,coverages",
-    [
-        ("case_a", 3, 1000),
-        ("case_b", 7, 5000),
-        ("case_c", 15, 50000),
-    ],
+    [(c["id"], c["cbr"], c["coverages"]) for c in _REF["cases"]],
 )
 def test_cbr_thickness_interpolation(case_id: str, cbr: float, coverages: float) -> None:
     """Benchmark: PCHIP thickness from USACE TM 5-822-12 Fig 1 matches reference.
