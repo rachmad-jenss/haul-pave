@@ -48,7 +48,7 @@ class ComparisonResult:
     delta_mm:
         Thickness difference: ``trh14.total_thickness_mm −
         usace.required_thickness_mm`` [mm].  Positive → TRH 14 requires
-        more material; negative → TRH 14 is more conservative (thinner).
+        more material than USACE; negative → USACE requires more material.
     subgrade_cbr:
         Subgrade CBR [%] used for both calculations.
     curve_id:

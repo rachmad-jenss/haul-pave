@@ -98,10 +98,9 @@ class TestDeltaArithmetic:
         expected_delta = result.trh14.total_thickness_mm - result.usace.required_thickness_mm
         assert result.delta_mm == pytest.approx(expected_delta, abs=1e-9)
 
-    def test_delta_sign_g6(self, fleet_d: TrafficInput) -> None:
-        """For soft subgrade (G6, CBR=5%), TRH 14 is typically thicker than USACE."""
+    def test_both_thicknesses_positive_g6(self, fleet_d: TrafficInput) -> None:
+        """Both sub-engines must produce positive thickness for G6 (CBR=5%)."""
         result = compare_methods(fleet_d, subgrade_cbr=5.0)
-        # Both methods should produce positive thickness; delta can go either way
         assert result.usace.required_thickness_mm > 0
         assert result.trh14.total_thickness_mm > 0
 
