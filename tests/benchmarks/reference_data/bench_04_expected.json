@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "title": "USACE TM 5-822-12 methodology — end-to-end worked example (Fleet B composition)",
+    "benchmark_id": "bench_04",
+    "sources": [
+      "USACE TM 5-822-12 (1990), Figure 1 — CBR design curves",
+      "AASHTO (1993) Guide for Design of Pavement Structures — 4th power LEF",
+      "USACE EM 1110-3-141 (1987) — Pavement Design for Roads, Streets, and Open Storage Areas"
+    ],
+    "notes": [
+      "Fleet B composition: CAT 785D (40 trips/day) + Motor Grader (5 trips/day).",
+      "CESA derived from bench_01 Fleet B hand-calc (AASHTO 4th power law).",
+      "Coverages derived from bench_02 Fleet B hand-calc (USACE design coverages method).",
+      "Thickness interpolated from usace_cbr_v1 curve at CBR=7%, coverages=530357.24.",
+      "Fleet B coverages (530357.24) exceed the usace_cbr_v1 curve max (100000).",
+      "Per interpolate_thickness() specification, out-of-range coverages are clamped to",
+      "the upper boundary (100000). Thickness therefore equals the value at max coverages.",
+      "Computed 2026-03-25."
+    ],
+    "tolerances": {
+      "cesa_pct": 1.0,
+      "coverages_pct": 2.0,
+      "thickness_mm": 5.0
+    },
+    "calculated_date": "2026-03-25"
+  },
+  "case": {
+    "fleet_id": "fleet_b_medium",
+    "subgrade_cbr": 7,
+    "design_life_years": 10,
+    "operating_days_per_year": 350,
+    "fleet_composition": {
+      "cat_785d": {
+        "trips_per_day": 40,
+        "front_axle_load_kN": 225.0,
+        "rear_tandem_load_kN": 1040.0,
+        "gross_vehicle_mass_t": 269.0
+      },
+      "motor_grader": {
+        "trips_per_day": 5,
+        "front_axle_load_kN": 85.0,
+        "rear_tandem_load_kN": 160.0,
+        "gross_vehicle_mass_t": 25.0
+      }
+    },
+    "expected_cesa": 508634682.58,
+    "expected_coverages": 530357.24,
+    "expected_thickness_mm": 564.49
+  }
+}
