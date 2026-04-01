@@ -123,6 +123,7 @@ benchmark/DAS-{ID}-desc → benchmark test baru
      3. Convention — sesuai CLAUDE.md dan project conventions
      4. Test coverage — apakah test sudah cukup untuk perubahan ini
      5. Regresi — apakah perubahan ini bisa break fitur lain
+     6. Long-term — apakah perubahan ini baik untuk jangka panjang dan tidak meninggalkan tech debt
      Berikan daftar findings dan saran fix.
      ```
    - Jika Codex menemukan critical issue → fix sebelum buat PR
