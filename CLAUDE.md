@@ -112,7 +112,23 @@ benchmark/DAS-{ID}-desc → benchmark test baru
 
 ### Saat selesai coding:
 1. Commit: `DAS-{ID}: deskripsi perubahan`
-2. Buat PR — title harus include `DAS-{ID}` (uppercase)
+
+2. **Codex Code Review (WAJIB sebelum buat PR):**
+   - Spawn Codex agent untuk review hasil kerja sebelum PR dibuat
+   - Jalankan via `codex:rescue` atau spawn agent `codex:codex-rescue` dengan prompt:
+     ```
+     Review kode yang baru diubah di repo ini. Cek:
+     1. Correctness — logic benar, edge cases handled, numerical accuracy
+     2. Security — tidak ada data exposure, proper input validation
+     3. Convention — sesuai CLAUDE.md (benchmark-first, confidence labels, SI units, pydantic models)
+     4. Test coverage — apakah benchmark test sudah ada dan pass
+     5. Regresi — apakah perubahan ini bisa break calculation lain
+     Berikan daftar findings dan saran fix.
+     ```
+   - Jika Codex menemukan critical issue → fix sebelum buat PR
+   - Jika Codex menemukan medium/low issue → fix atau catat sebagai tech-debt
+
+3. Buat PR — title harus include `DAS-{ID}` (uppercase)
 3. Update Notion **Next action** → "PR review"
 4. Merge via **Squash & Merge**
 5. GitHub Actions otomatis sync status ke Notion saat PR merged
@@ -172,6 +188,7 @@ Gunakan `/loop 3m` untuk polling otomatis setiap 3 menit sampai semua selesai.
 
 **Exit condition (SEMUA harus terpenuhi sebelum berhenti):**
 - ✅ Semua CI checks hijau (ruff, mypy, pytest, coverage ≥85%)
+- ✅ Codex code review passed (sebelum PR dibuat)
 - ✅ Minimal CodeRabbit sudah review
 - ✅ Semua review comments yang butuh fix sudah resolved
 - ✅ Semua item test plan di deskripsi PR sudah checked (`[x]`)
