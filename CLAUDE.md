@@ -118,11 +118,11 @@ benchmark/DAS-{ID}-desc → benchmark test baru
    - Jalankan via `codex:rescue` atau spawn agent `codex:codex-rescue` dengan prompt:
      ```
      Review kode yang baru diubah di repo ini. Cek:
-     1. Correctness — logic benar, edge cases handled, numerical accuracy
-     2. Security — tidak ada data exposure, proper input validation
-     3. Convention — sesuai CLAUDE.md (benchmark-first, confidence labels, SI units, pydantic models)
-     4. Test coverage — apakah benchmark test sudah ada dan pass
-     5. Regresi — apakah perubahan ini bisa break calculation lain
+     1. Correctness — logic benar, edge cases handled
+     2. Security — tidak ada vulnerability (injection, exposure, bypass, dll)
+     3. Convention — sesuai CLAUDE.md dan project conventions
+     4. Test coverage — apakah test sudah cukup untuk perubahan ini
+     5. Regresi — apakah perubahan ini bisa break fitur lain
      Berikan daftar findings dan saran fix.
      ```
    - Jika Codex menemukan critical issue → fix sebelum buat PR
