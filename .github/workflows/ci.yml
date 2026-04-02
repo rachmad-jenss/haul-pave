@@ -9,6 +9,7 @@ on:
       - '.github/*.md'
       - 'examples/**'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
     paths-ignore:
       - '*.md'
@@ -22,6 +23,7 @@ concurrency:
 
 jobs:
   quality:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -39,6 +41,7 @@ jobs:
         run: mypy src/haulpave/
 
   test:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
