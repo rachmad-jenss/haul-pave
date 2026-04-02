@@ -129,10 +129,13 @@ benchmark/DAS-{ID}-desc → benchmark test baru
    - Jika Codex menemukan critical issue → fix sebelum buat PR
    - Jika Codex menemukan medium/low issue → fix atau catat sebagai tech-debt
 
-3. Buat PR — title harus include `DAS-{ID}` (uppercase)
-3. Update Notion **Next action** → "PR review"
-4. Merge via **Squash & Merge**
-5. GitHub Actions otomatis sync status ke Notion saat PR merged
+3. Buat PR sebagai **Draft** — title harus include `DAS-{ID}` (uppercase)
+   - Gunakan `gh pr create --draft` agar CI tidak jalan sampai siap
+   - Push semua fix dari Codex review, address review comments, dll selama masih draft (CI tidak jalan = hemat minutes)
+4. Setelah semua fix selesai, mark **Ready for Review** → `gh pr ready {PR_NUMBER}`
+   - CI baru jalan di titik ini (1x saja, bukan setiap push)
+5. Update Notion **Next action** → "PR review"
+6. Merge via **Squash & Merge**
 
 ### Setelah PR dibuat (WAJIB — 3 FASE, SEMUA HARUS SELESAI):
 **JANGAN BERHENTI setelah CI hijau.** Review dari Codex/CodeRabbit/Vercel butuh waktu 3-10 menit setelah PR dibuat. Test plan di deskripsi PR WAJIB dijalankan. Ketiga fase di bawah harus diselesaikan sebelum PR dianggap siap merge.
