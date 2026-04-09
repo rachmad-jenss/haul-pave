@@ -32,6 +32,20 @@ class TestMaterialLayer:
         with pytest.raises(ValidationError):
             MaterialLayer(name="X", thickness_mm=-10.0)
 
+    def test_template_without_source_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="is_template"):
+            MaterialLayer(name="Gravel", is_template=True)
+
+    def test_template_with_source_accepted(self) -> None:
+        layer = MaterialLayer(name="Gravel", is_template=True, source="TRH 14 Table 2")
+        assert layer.is_template is True
+        assert layer.source == "TRH 14 Table 2"
+
+    def test_non_template_without_source_accepted(self) -> None:
+        layer = MaterialLayer(name="Site gravel")
+        assert layer.is_template is False
+        assert layer.source is None
+
     def test_immutable(self) -> None:
         layer = MaterialLayer(name="Base")
         with pytest.raises(ValidationError):

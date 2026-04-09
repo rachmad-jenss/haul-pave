@@ -9,7 +9,7 @@ No liability is accepted for use of template values without independent verifica
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class MaterialLayer(BaseModel):
@@ -43,3 +43,13 @@ class MaterialLayer(BaseModel):
         default=None,
         description="Provenance reference for material properties (required for is_template=True)",
     )
+
+    @model_validator(mode="after")
+    def template_requires_source(self) -> MaterialLayer:
+        """Enforce that template materials have a provenance source."""
+        if self.is_template and not self.source:
+            raise ValueError(
+                "MaterialLayer with is_template=True must have a non-empty 'source' field. "
+                "All template/reference data must be traceable to a published source."
+            )
+        return self

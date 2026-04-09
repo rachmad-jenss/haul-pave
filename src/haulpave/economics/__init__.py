@@ -1,4 +1,9 @@
-"""Economics module — scenario-based cost comparison.
+"""Economics module — scenario-based operating cost analysis.
 
-Implemented in Phase 3.
+Provides ``compute_economics`` for calculating haul road operating costs
+from a ``CostScenario`` input.
 """
+
+from haulpave.economics.engine import EconomicsResult, compute_economics, to_economic_result
+
+__all__ = ["EconomicsResult", "compute_economics", "to_economic_result"]
