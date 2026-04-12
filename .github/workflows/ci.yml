@@ -44,6 +44,9 @@ jobs:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       matrix:
         python-version: ${{ github.event_name == 'push' && fromJSON('["3.10", "3.11", "3.12"]') || fromJSON('["3.12"]') }}
@@ -54,8 +57,39 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: pip install -e ".[dev]"
+      - name: Show package versions
+        run: pip freeze
       - name: Run tests with coverage
-        run: pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/
+        id: run-tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python --version
+          pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long 2>&1 | tee /tmp/pytest_out.txt
+      - name: Post failure details to PR
+        if: steps.run-tests.outcome == 'failure' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "**CI Test Failure — Python ${{ matrix.python-version }}**"
+            echo ""
+            echo "Installed packages:"
+            echo '```'
+            pip freeze 2>/dev/null | head -30
+            echo '```'
+            echo ""
+            echo "Test output (last 100 lines):"
+            echo '```'
+            tail -n 100 /tmp/pytest_out.txt 2>/dev/null || echo "(no output captured)"
+            echo '```'
+          } > /tmp/ci_comment.md
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body-file /tmp/ci_comment.md
+      - name: Fail if tests failed
+        if: steps.run-tests.outcome == 'failure'
+        run: exit 1
       - name: Run benchmark tests
         # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
         # Any other non-zero exit code (1 = test failure) is a real error.

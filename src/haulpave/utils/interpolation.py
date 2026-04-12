@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -91,7 +92,21 @@ def interpolate_thickness(
     if coverages <= 0:
         raise ValueError(f"coverages must be > 0, got {coverages}")
 
-    # Clamp coverages to range (positive out-of-range values are clamped silently)
+    # Clamp coverages to range with warning
+    if coverages < coverage_levels[0]:
+        warnings.warn(
+            f"USACE CBR: design coverages ({coverages:.0f}) below curve minimum "
+            f"({coverage_levels[0]:.0f}), clamped to {coverage_levels[0]:.0f}.",
+            UserWarning,
+            stacklevel=2,
+        )
+    elif coverages > coverage_levels[-1]:
+        warnings.warn(
+            f"USACE CBR: design coverages ({coverages:.0f}) exceed curve maximum "
+            f"({coverage_levels[-1]:.0f}), clamped to {coverage_levels[-1]:.0f}.",
+            UserWarning,
+            stacklevel=2,
+        )
     log_cov = np.log10(np.clip(coverages, coverage_levels[0], coverage_levels[-1]))
     log_cov_levels = np.log10(coverage_levels)
 

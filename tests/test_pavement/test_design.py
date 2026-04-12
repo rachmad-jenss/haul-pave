@@ -230,11 +230,15 @@ class TestDesignPavement:
 
     def test_bench04_cesa(self, fleet_b_traffic: TrafficInput) -> None:
         """Fleet B CESA must match bench_04 expected value within 1%."""
-        result = design_pavement(
-            traffic=fleet_b_traffic,
-            subgrade_cbr=7.0,
-            curve_id="usace_cbr_v1",
-        )
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
         expected_cesa = 508_634_682.58
         rel_error = abs(result.total_cesa - expected_cesa) / expected_cesa
         assert rel_error <= 0.01, (
@@ -244,11 +248,15 @@ class TestDesignPavement:
 
     def test_bench04_coverages(self, fleet_b_traffic: TrafficInput) -> None:
         """Fleet B coverages must match bench_04 expected value within 2%."""
-        result = design_pavement(
-            traffic=fleet_b_traffic,
-            subgrade_cbr=7.0,
-            curve_id="usace_cbr_v1",
-        )
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
         expected_coverages = 530_357.24
         rel_error = abs(result.total_coverages - expected_coverages) / expected_coverages
         assert rel_error <= 0.02, (
@@ -264,11 +272,15 @@ class TestDesignPavement:
         interpolate_thickness() spec, out-of-range values are clamped to the
         curve boundary, so the design is governed by the 100,000-coverage curve.
         """
-        result = design_pavement(
-            traffic=fleet_b_traffic,
-            subgrade_cbr=7.0,
-            curve_id="usace_cbr_v1",
-        )
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
         expected_thickness = 564.49
         abs_error = abs(result.required_thickness_mm - expected_thickness)
         assert abs_error <= 5.0, (
@@ -279,25 +291,33 @@ class TestDesignPavement:
 
     def test_cesa_consistent_with_traffic_module(self, fleet_b_traffic: TrafficInput) -> None:
         """design_pavement CESA must match compute_cesa() called independently."""
+        import warnings
+
         from haulpave.traffic.cesa import compute_cesa
 
-        result = design_pavement(
-            traffic=fleet_b_traffic,
-            subgrade_cbr=7.0,
-            curve_id="usace_cbr_v1",
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
         cesa_direct = compute_cesa(fleet_b_traffic)
         assert result.total_cesa == pytest.approx(cesa_direct.total_cesa, rel=1e-9)
 
     def test_coverages_consistent_with_traffic_module(self, fleet_b_traffic: TrafficInput) -> None:
         """design_pavement coverages must match compute_coverages() called independently."""
+        import warnings
+
         from haulpave.traffic.coverages import compute_coverages
 
-        result = design_pavement(
-            traffic=fleet_b_traffic,
-            subgrade_cbr=7.0,
-            curve_id="usace_cbr_v1",
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
         cov_direct = compute_coverages(fleet_b_traffic)
         assert result.total_coverages == pytest.approx(cov_direct.total_coverages, rel=1e-9)
         assert result.design_wheel_load_kn == pytest.approx(
