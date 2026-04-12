@@ -56,12 +56,29 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Show package versions
         run: pip list | grep -E "pydantic|numpy|scipy|typer|pytest|rich|coverage"
-      - name: Show Python version
-        run: python --version
-      - name: Run tests WITHOUT coverage (isolate failure)
-        run: pytest tests/ -x --tb=long -v
-      - name: Run tests WITH coverage
-        run: pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long
+      - name: Run tests with coverage
+        id: run-tests
+        continue-on-error: true
+        run: |
+          python --version
+          pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long 2>&1 | tee /tmp/test_out.txt
+          exit ${PIPESTATUS[0]}
+      - name: Post debug output to PR
+        if: steps.run-tests.outcome == 'failure' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUTPUT=$(tail -200 /tmp/test_out.txt | head -100)
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "**CI debug (Python ${{ matrix.python-version }})**
+
+\`\`\`
+${OUTPUT}
+\`\`\`
+"
+      - name: Fail if tests failed
+        if: steps.run-tests.outcome == 'failure'
+        run: exit 1
       - name: Run benchmark tests
         # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
         # Any other non-zero exit code (1 = test failure) is a real error.
