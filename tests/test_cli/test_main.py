@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 from typer.testing import CliRunner
+
+
+def _strip_ansi(text: str) -> str:
+    """Remove ANSI escape sequences from text."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
 from haulpave.cli.main import app
 
@@ -123,5 +129,6 @@ class TestCliHelp:
     def test_design_help(self) -> None:
         result = runner.invoke(app, ["design", "--help"])
         assert result.exit_code == 0
-        assert "--cbr" in result.output
-        assert "--input" in result.output
+        output = _strip_ansi(result.output)
+        assert "--cbr" in output
+        assert "--input" in output
