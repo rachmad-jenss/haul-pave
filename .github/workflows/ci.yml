@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
       - name: Run tests with coverage
-        run: pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/
+        run: pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long
       - name: Run benchmark tests
         # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
         # Any other non-zero exit code (1 = test failure) is a real error.
