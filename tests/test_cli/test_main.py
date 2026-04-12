@@ -9,14 +9,14 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+from haulpave.cli.main import app
+
+runner = CliRunner()
+
 
 def _strip_ansi(text: str) -> str:
     """Remove ANSI escape sequences from text."""
     return re.sub(r"\x1b\[[0-9;]*m", "", text)
-
-from haulpave.cli.main import app
-
-runner = CliRunner()
 
 # Minimal traffic JSON for CLI tests
 _TRAFFIC_DATA = {
