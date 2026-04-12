@@ -144,7 +144,8 @@ class TestInterpolateThickness:
 
     def test_coverages_below_min_clamps_to_min_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """Coverages below curve minimum are clamped to minimum coverage level (10)."""
-        result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1)
+        with pytest.warns(UserWarning, match="below curve minimum"):
+            result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1)
         result_min = interpolate_thickness(curve_data, cbr=10, coverages=10)
         assert result_clamped == result_min, (
             f"Expected coverages=1 to clamp to coverages=10: "
@@ -153,9 +154,18 @@ class TestInterpolateThickness:
 
     def test_coverages_above_max_clamps_to_max_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """Coverages above curve maximum are clamped to maximum coverage level (100000)."""
-        result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
+        with pytest.warns(UserWarning, match="exceed curve maximum"):
+            result_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
         result_max = interpolate_thickness(curve_data, cbr=10, coverages=100_000)
         assert result_clamped == result_max, (
             f"Expected coverages=1_000_000 to clamp to coverages=100_000: "
             f"got {result_clamped:.1f} vs {result_max:.1f} mm"
         )
+
+    def test_no_warning_when_coverages_in_range(self, curve_data: dict) -> None:  # type: ignore[type-arg]
+        """No warning emitted when coverages are within curve range."""
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            interpolate_thickness(curve_data, cbr=10, coverages=1000)

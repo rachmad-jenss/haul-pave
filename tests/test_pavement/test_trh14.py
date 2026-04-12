@@ -191,7 +191,8 @@ class TestComputeTrh14CoverageClamping:
             working_days_per_year=10,
         )
         # Should not raise — coverages are clamped to catalog minimum (100)
-        result = compute_trh14(traffic_low, subgrade_cbr=10.0)
+        with pytest.warns(UserWarning, match="below catalog minimum"):
+            result = compute_trh14(traffic_low, subgrade_cbr=10.0)
         assert result.total_coverages < 100  # confirms input is below catalog min
         assert result.total_thickness_mm == pytest.approx(150.0, abs=1e-6)  # G5 @ min knot
 
@@ -208,7 +209,8 @@ class TestComputeTrh14CoverageClamping:
             design_life_years=50,
             working_days_per_year=365,
         )
-        result = compute_trh14(traffic_heavy, subgrade_cbr=10.0)
+        with pytest.warns(UserWarning, match="exceed catalog maximum"):
+            result = compute_trh14(traffic_heavy, subgrade_cbr=10.0)
         assert result.total_coverages > 1_000_000  # confirms input is above catalog max
         assert result.total_thickness_mm == pytest.approx(600.0, abs=1e-6)  # G5 @ max knot
 

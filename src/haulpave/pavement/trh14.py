@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import math
+import warnings
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -127,6 +128,20 @@ def _interpolate_catalog(
             "Catalog shape mismatch: len(thickness_values) must equal len(coverage_levels)"
         )
 
+    if coverages < coverage_levels[0]:
+        warnings.warn(
+            f"TRH 14: design coverages ({coverages:.0f}) below catalog minimum "
+            f"({coverage_levels[0]}), clamped to {coverage_levels[0]}.",
+            UserWarning,
+            stacklevel=2,
+        )
+    elif coverages > coverage_levels[-1]:
+        warnings.warn(
+            f"TRH 14: design coverages ({coverages:.0f}) exceed catalog maximum "
+            f"({coverage_levels[-1]}), clamped to {coverage_levels[-1]}.",
+            UserWarning,
+            stacklevel=2,
+        )
     cov_clamped = max(float(coverage_levels[0]), min(float(coverage_levels[-1]), coverages))
     log_cov = math.log10(cov_clamped)
     log_levels = [math.log10(float(c)) for c in coverage_levels]

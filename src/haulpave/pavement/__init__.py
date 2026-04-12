@@ -62,7 +62,7 @@ class PavementResult:
 def design_pavement(
     traffic: TrafficInput,
     subgrade_cbr: float,
-    curve_id: str,
+    curve_id: str = "usace_cbr_v1",
 ) -> PavementResult:
     """Design pavement thickness using the USACE TM 5-822-12 CBR method.
 
