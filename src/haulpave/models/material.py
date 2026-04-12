@@ -47,7 +47,7 @@ class MaterialLayer(BaseModel):
     @model_validator(mode="after")
     def template_requires_source(self) -> MaterialLayer:
         """Enforce that template materials have a provenance source."""
-        if self.is_template and not self.source:
+        if self.is_template and not (self.source and self.source.strip()):
             raise ValueError(
                 "MaterialLayer with is_template=True must have a non-empty 'source' field. "
                 "All template/reference data must be traceable to a published source."

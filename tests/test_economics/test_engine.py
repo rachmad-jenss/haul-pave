@@ -86,6 +86,26 @@ class TestComputeEconomics:
             result.cost_per_trip = 999.0  # type: ignore[misc]
 
 
+class TestInputValidation:
+    def test_negative_trips_per_day_raises(self, scenario: CostScenario) -> None:
+        with pytest.raises(ValueError, match="trips_per_day must be >= 0"):
+            compute_economics(scenario, trips_per_day=-1.0)
+
+    def test_zero_working_days_with_trips_raises(self, scenario: CostScenario) -> None:
+        with pytest.raises(ValueError, match="working_days_per_year must be > 0"):
+            compute_economics(scenario, trips_per_day=10.0, working_days_per_year=0)
+
+    def test_negative_working_days_with_trips_raises(self, scenario: CostScenario) -> None:
+        with pytest.raises(ValueError, match="working_days_per_year must be > 0"):
+            compute_economics(scenario, trips_per_day=10.0, working_days_per_year=-1)
+
+    def test_zero_trips_ignores_working_days(self, scenario: CostScenario) -> None:
+        # trips_per_day=0 → annual calc skipped; working_days irrelevant
+        result = compute_economics(scenario, trips_per_day=0.0, working_days_per_year=-1)
+        assert result.trips_per_year == 0.0
+        assert result.annual_cost == 0.0
+
+
 class TestToEconomicResult:
     def test_converts_to_pydantic_model(self, scenario: CostScenario) -> None:
         result = compute_economics(scenario, trips_per_day=10.0)
@@ -95,3 +115,8 @@ class TestToEconomicResult:
         assert pydantic_result.cost_per_trip == pytest.approx(result.cost_per_trip)
         assert pydantic_result.cost_per_tonne_km == pytest.approx(result.cost_per_tonne_km)
         assert pydantic_result.currency == result.currency
+
+    def test_method_preserved(self, scenario: CostScenario) -> None:
+        result = compute_economics(scenario)
+        pydantic_result = to_economic_result(result)
+        assert pydantic_result.method == result.method

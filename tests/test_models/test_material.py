@@ -46,6 +46,10 @@ class TestMaterialLayer:
         assert layer.is_template is False
         assert layer.source is None
 
+    def test_template_with_whitespace_only_source_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="is_template"):
+            MaterialLayer(name="Gravel", is_template=True, source="   ")
+
     def test_immutable(self) -> None:
         layer = MaterialLayer(name="Base")
         with pytest.raises(ValidationError):

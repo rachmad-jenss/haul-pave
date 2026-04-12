@@ -96,6 +96,11 @@ def compute_economics(
     EconomicsResult
         Frozen dataclass with cost breakdown and optional annual totals.
     """
+    if trips_per_day < 0:
+        raise ValueError("trips_per_day must be >= 0")
+    if trips_per_day > 0 and working_days_per_year <= 0:
+        raise ValueError("working_days_per_year must be > 0 when trips_per_day is provided")
+
     a = scenario.assumptions
     trip_time_hours = scenario.haul_distance_km / scenario.average_speed_kmh
 
@@ -133,4 +138,5 @@ def to_economic_result(result: EconomicsResult) -> EconomicResult:
         trips_per_year=result.trips_per_year,
         annual_cost=result.annual_cost,
         currency=result.currency,
+        method=result.method,
     )
