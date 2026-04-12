@@ -18,6 +18,7 @@ def _strip_ansi(text: str) -> str:
     """Remove ANSI escape sequences from text."""
     return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
+
 # Minimal traffic JSON for CLI tests
 _TRAFFIC_DATA = {
     "fleet": [
