@@ -69,6 +69,13 @@ Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
 
 6. **Parent Issue harus sinkron** — parentId di Linear = Parent Issue di Notion. Keduanya harus menunjuk ke issue yang sama.
 
+7. **Buat GitHub Issue** via `gh issue create --repo rachmad-jenss/haul-pave`:
+   - `--title`: `[DAS-{ID}] deskripsi singkat` (sama dengan Linear dan Notion)
+   - `--body`: description dari Linear + baris di bawah: `\n---\nLinear: {url}`
+   - `--label`: map dari Linear labels (Feature→`feature`, Bug→`bug`, Chore→`chore`, Docs→`documentation`, Benchmark→`benchmark`) + selalu tambah `linear-sync`
+   - Catat GitHub Issue number — akan dipakai di PR description dan saat close nanti
+   - Jika issue sudah Done saat buat (jarang), langsung close: `gh issue close {number} --repo rachmad-jenss/haul-pave`
+
 ### Batch subagent (mengerjakan beberapa isu sekaligus):
 Jika user minta mengerjakan beberapa isu secara paralel menggunakan subagent:
 - **Analisis dulu file mana saja yang akan diedit tiap isu** sebelum memulai
@@ -131,6 +138,7 @@ benchmark/DAS-{ID}-desc → benchmark test baru
 
 3. Buat PR sebagai **Draft** — title harus include `DAS-{ID}` (uppercase)
    - Gunakan `gh pr create --draft` agar CI tidak jalan sampai siap
+   - Sertakan `Closes #{github_issue_number}` di body PR agar GitHub Issue ter-close otomatis saat merge
    - Push semua fix dari Codex review, address review comments, dll selama masih draft (CI tidak jalan = hemat minutes)
 4. Setelah semua fix selesai, mark **Ready for Review** → `gh pr ready {PR_NUMBER}`
    - CI baru jalan di titik ini (1x saja, bukan setiap push)
@@ -204,6 +212,7 @@ Setelah user merge PR (atau issue di-close), lakukan cleanup & sync:
 1. **Verify status sinkron:**
    - Linear status harus "Done" (biasanya otomatis via Linear bot saat PR merged)
    - Notion status harus "Done" (biasanya otomatis via `notion-sync.yml` GH Actions)
+   - GitHub Issue harus "closed" (otomatis via `Closes #N` di PR body — jika tidak, close manual: `gh issue close {number} --repo rachmad-jenss/haul-pave`)
    - Jika salah satu belum terupdate, **update manual**
 
 2. **Update Notion task page** dengan info PR:
