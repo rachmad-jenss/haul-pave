@@ -60,6 +60,7 @@ jobs:
         id: run-tests
         continue-on-error: true
         run: |
+          set -o pipefail
           python --version
           pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long 2>&1 | tee /tmp/pytest_out.txt
       - name: Post failure details to PR
