@@ -44,6 +44,7 @@ Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
    - `--title`: deskripsi singkat task
    - `--body`: detail teknis lengkap — problem statement, solution, acceptance criteria, checklist
    - `--label`: sesuai konteks (Feature→`feature`, Bug→`bug`, Chore→`chore`, Docs→`documentation`, Benchmark→`benchmark`) + selalu tambah `linear-sync`
+   - Setelah issue terbuat, catat nomor `{N}` dari output URL, lalu rename title: `gh issue edit {N} --title "[GH-{N}] deskripsi singkat"` — format title GitHub Issue harus konsisten dengan Notion
    - Catat GitHub Issue number → ini jadi identifier task: **`GH-{N}`**
 
 2. **Cek dulu apakah Notion task sudah ada** — search by keyword di Tasks DB. Jika sudah ada, **update**. Jika belum, **buat baru** via `notion-create-pages`:
