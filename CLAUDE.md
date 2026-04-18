@@ -25,7 +25,7 @@ Docs: MkDocs + GitHub Pages
 
 ## Task Workflow
 
-> ⚠️ **Linear sedang di-pause (quota).** Jangan buat issue baru di Linear. Primary tracker: **GitHub Issues + Notion**. Saat Linear aktif kembali, backfill issue baru ke Linear dan update Code di Notion dari `GH-{N}` ke `DAS-{ID}`.
+> ⚠️ **Linear sedang di-pause (quota).** Jangan buat issue baru di Linear. Primary tracker: **GitHub Issues + Notion**. Saat Linear aktif kembali, backfill issue baru ke Linear dan update Code di Notion ke `DAS-{LinearID}` jika nomor berbeda dari nomor GitHub.
 
 ### Buat issue/task baru:
 Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
@@ -44,12 +44,12 @@ Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
    - `--title`: deskripsi singkat task
    - `--body`: detail teknis lengkap — problem statement, solution, acceptance criteria, checklist
    - `--label`: sesuai konteks (Feature→`feature`, Bug→`bug`, Chore→`chore`, Docs→`documentation`, Benchmark→`benchmark`) + selalu tambah `linear-sync`
-   - Setelah issue terbuat, catat nomor `{N}` dari output URL, lalu rename title: `gh issue edit {N} --title "[GH-{N}] deskripsi singkat"` — format title GitHub Issue harus konsisten dengan Notion
-   - Catat GitHub Issue number → ini jadi identifier task: **`GH-{N}`**
+   - Setelah issue terbuat, catat nomor `{N}` dari output URL, lalu rename title: `gh issue edit {N} --title "[DAS-{N}] deskripsi singkat"` — format title GitHub Issue harus konsisten dengan Notion
+   - Catat GitHub Issue number → ini jadi identifier task: **`DAS-{N}`**
 
 2. **Cek dulu apakah Notion task sudah ada** — search by keyword di Tasks DB. Jika sudah ada, **update**. Jika belum, **buat baru** via `notion-create-pages`:
-   - `Title`: `[GH-{N}] deskripsi singkat`
-   - `Code`: `GH-{N}`
+   - `Title`: `[DAS-{N}] deskripsi singkat`
+   - `Code`: `DAS-{N}`
    - `Status`: "In Progress" atau "Next Up"
    - `Priority`: P1/P2/P3 (tanya user)
    - `Type`: Feature / Bug / Chore / Docs
@@ -64,7 +64,7 @@ Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
 4. **Deadline sinkron** — Due di Notion = target deadline yang disepakati.
 5. **Parent Issue sinkron** — Parent Issue di Notion harus menunjuk ke parent task yang sama.
 
-> 📌 Saat Linear aktif kembali: buat issue di Linear, lalu update Code di Notion dari `GH-{N}` ke `DAS-{ID}`.
+> 📌 Saat Linear aktif kembali: buat issue di Linear, lalu update Code di Notion ke `DAS-{LinearID}` jika nomor berbeda dari nomor GitHub.
 
 ### Batch subagent (mengerjakan beberapa isu sekaligus):
 Jika user minta mengerjakan beberapa isu secara paralel menggunakan subagent:
@@ -99,15 +99,15 @@ Jika user minta mengerjakan beberapa isu secara paralel menggunakan subagent:
 ### Branch naming:
 ```
 main → stable release — NEVER push directly
-feature/GH-{N}-desc  → fitur baru
-fix/GH-{N}-desc      → bug fix
-chore/GH-{N}-desc    → maintenance
-docs/GH-{N}-desc     → dokumentasi
-benchmark/GH-{N}-desc → benchmark test baru
+feature/DAS-{N}-desc  → fitur baru
+fix/DAS-{N}-desc      → bug fix
+chore/DAS-{N}-desc    → maintenance
+docs/DAS-{N}-desc     → dokumentasi
+benchmark/DAS-{N}-desc → benchmark test baru
 ```
 
 ### Saat selesai coding:
-1. Commit: `GH-{N}: deskripsi perubahan`
+1. Commit: `DAS-{N}: deskripsi perubahan`
 
 2. **Codex Code Review (WAJIB sebelum buat PR):**
    - Spawn Codex agent untuk review hasil kerja sebelum PR dibuat
@@ -125,7 +125,7 @@ benchmark/GH-{N}-desc → benchmark test baru
    - Jika Codex menemukan critical issue → fix sebelum buat PR
    - Jika Codex menemukan medium/low issue → fix atau catat sebagai tech-debt
 
-3. Buat PR sebagai **Draft** — title harus include identifier (`GH-{N}` untuk isu baru, atau `DAS-{ID}` untuk isu lama) (uppercase)
+3. Buat PR sebagai **Draft** — title harus include `DAS-{N}` (uppercase)
    - Gunakan `gh pr create --draft` agar CI tidak jalan sampai siap
    - Sertakan `Closes #{github_issue_number}` di body PR agar GitHub Issue ter-close otomatis saat merge
    - Push semua fix dari Codex review, address review comments, dll selama masih draft (CI tidak jalan = hemat minutes)
@@ -221,7 +221,7 @@ Setelah user merge PR (atau issue di-close), lakukan cleanup & sync:
 - Setelah unblocked, kembalikan Status ke "In Progress" dan update Next action sesuai fase saat ini
 
 ### Notion Tasks Convention:
-- Title selalu diawali `[GH-{N}]` untuk isu baru, `[DAS-{ID}]` untuk isu lama — contoh: `[GH-XX] Implement CESA calculation`
+- Title selalu diawali `[DAS-{N}]` — contoh: `[DAS-XX] Implement CESA calculation`
 - Wajib isi **Product/App** → `HaulPave — Library`
 - Wajib isi **Repo** → `haul-pave`
 
