@@ -25,56 +25,45 @@ Docs: MkDocs + GitHub Pages
 
 ## Task Workflow
 
+> ⚠️ **Linear sedang di-pause (quota).** Jangan buat issue baru di Linear. Primary tracker: **GitHub Issues + Notion**. Saat Linear aktif kembali, backfill issue baru ke Linear dan update Code di Notion dari `GH-{N}` ke `DAS-{ID}`.
+
 ### Buat issue/task baru:
 Jika user minta fitur baru, bug fix, atau chore yang belum ada issue-nya:
 
 **⚠️ Strategic Alignment Check (WAJIB sebelum buat issue):**
-- Cek Linear issues yang sudah ada di project ini — apakah sudah ada issue serupa atau di area yang sama?
+- Cek GitHub Issues repo ini apakah sudah ada issue serupa: `gh issue list --repo rachmad-jenss/haul-pave --state all`
+- Cek Notion Tasks DB (`collection://2f8c4f5f-1479-4f28-8136-2368d18e2090`) — apakah ada task serupa? Search by keyword.
 - Cek Notion Initiatives DB (`collection://63a30ec4-8e03-4a69-aaa2-72f29d69af14`) — initiative mana yang terkait? Apakah aligned dengan OKR kuartal ini?
 - Evaluasi scope:
   - **Quick-fix OK jika:** isolated change, tidak menambah tech debt, area ini jarang diubah
   - **Proper solution needed jika:** area ini akan sering diubah, atau sudah ada 3+ issues di area/module yang sama
 - Jika butuh proper solution → consider membuat parent issue "Refactor [area]" dulu, lalu issue ini jadi sub-task
-- Jika fix ini sadar menambah tech debt → tambahkan label `tech-debt` di Linear dengan catatan kapan harus dibayar
+- Jika fix ini sadar menambah tech debt → tambahkan label `tech-debt` di GitHub Issue dengan catatan kapan harus dibayar
 
-1. **Buat Linear issue** via `save_issue`:
-   - `title`: deskripsi singkat task
-   - `team`: "Dash Teknologi"
-   - `project`: "HaulPave — Library"
-   - `priority`: 1=Urgent, 2=High, 3=Normal, 4=Low (tanya user)
-   - `dueDate`: target deadline ISO format (tanya user)
-   - `state`: "In Progress" (jika langsung dikerjakan) atau "Todo"
-   - `labels`: sesuai konteks (e.g. "Feature", "Bug", "Chore", "Docs", "Benchmark")
-   - `description`: detail teknis lengkap — problem statement, solution, acceptance criteria, checklist
-   - `parentId`: jika task ini bagian dari issue yang lebih besar (e.g. Phase/Epic), set parent issue ID. Jika tidak ada parent yang cocok dan task ini bisa menjadi parent baru, buat sebagai standalone.
+1. **Buat GitHub Issue** via `gh issue create --repo rachmad-jenss/haul-pave`:
+   - `--title`: deskripsi singkat task
+   - `--body`: detail teknis lengkap — problem statement, solution, acceptance criteria, checklist
+   - `--label`: sesuai konteks (Feature→`feature`, Bug→`bug`, Chore→`chore`, Docs→`documentation`, Benchmark→`benchmark`) + selalu tambah `linear-sync`
+   - Catat GitHub Issue number → ini jadi identifier task: **`GH-{N}`**
 
-2. **Catat task ID** yang di-return Linear (format `DAS-{ID}`)
-
-3. **Cek dulu apakah Notion task sudah ada** — search by Code `DAS-{ID}` di data source `collection://2f8c4f5f-1479-4f28-8136-2368d18e2090`. Jika sudah ada (dibuat otomatis oleh Linear→Notion webhook), **update** task yang ada. Jika belum ada, **buat baru** via `notion-create-pages`:
-   - `Title`: `[DAS-{ID}] deskripsi singkat`
-   - `Code`: `DAS-{ID}`
+2. **Cek dulu apakah Notion task sudah ada** — search by keyword di Tasks DB. Jika sudah ada, **update**. Jika belum, **buat baru** via `notion-create-pages`:
+   - `Title`: `[GH-{N}] deskripsi singkat`
+   - `Code`: `GH-{N}`
    - `Status`: "In Progress" atau "Next Up"
-   - `Priority`: P1/P2/P3 (sesuai Linear: Urgent/High→P1, Normal→P2, Low→P3)
+   - `Priority`: P1/P2/P3 (tanya user)
    - `Type`: Feature / Bug / Chore / Docs
-   - `date:Due:start`: deadline yang sama dengan Linear (ISO format)
-   - `Initiative`: link ke initiative yang relevan — cek Initiatives DB (`collection://63a30ec4-8e03-4a69-aaa2-72f29d69af14`), jika tidak ada yang cocok, **buat initiative baru** dengan Title, Quarter, Priority, Status, Product, Goal, dan Outcome metric
-   - `Parent Issue`: jika ada parentId di Linear, search parent task by Code di Notion dan link. Ini self-relation (Tasks → Tasks).
-   - `Next action`: "Coding" (jika langsung dikerjakan) atau kosong
+   - `date:Due:start`: target deadline (tanya user, ISO format)
+   - `Initiative`: link ke initiative yang relevan — cek Initiatives DB, buat baru jika tidak ada yang cocok
+   - `Parent Issue`: jika task ini bagian dari issue lebih besar, search parent task di Notion dan link
+   - `Next action`: "Coding" atau kosong
    - `Product/App`: link ke HaulPave — Library
    - `Repo`: link ke haul-pave
 
-4. **Isi konten halaman Notion** — jangan biarkan blank. Tulis konten page yang sama dengan description di Linear issue (problem, solution, acceptance criteria). Gunakan `replace_content` atau set `content` saat create.
+3. **Isi konten halaman Notion** — problem statement, solution, acceptance criteria.
+4. **Deadline sinkron** — Due di Notion = target deadline yang disepakati.
+5. **Parent Issue sinkron** — Parent Issue di Notion harus menunjuk ke parent task yang sama.
 
-5. **Deadline harus sinkron** — Due di Notion = dueDate di Linear. Jika salah satu berubah, update yang lain juga.
-
-6. **Parent Issue harus sinkron** — parentId di Linear = Parent Issue di Notion. Keduanya harus menunjuk ke issue yang sama.
-
-7. **Buat GitHub Issue** via `gh issue create --repo rachmad-jenss/haul-pave`:
-   - `--title`: `[DAS-{ID}] deskripsi singkat` (sama dengan Linear dan Notion)
-   - `--body`: description dari Linear + baris di bawah: `\n---\nLinear: {url}`
-   - `--label`: map dari Linear labels (Feature→`feature`, Bug→`bug`, Chore→`chore`, Docs→`documentation`, Benchmark→`benchmark`) + selalu tambah `linear-sync`
-   - Catat GitHub Issue number — akan dipakai di PR description dan saat close nanti
-   - Jika issue sudah Done saat buat (jarang), langsung close: `gh issue close {number} --repo rachmad-jenss/haul-pave`
+> 📌 Saat Linear aktif kembali: buat issue di Linear, lalu update Code di Notion dari `GH-{N}` ke `DAS-{ID}`.
 
 ### Batch subagent (mengerjakan beberapa isu sekaligus):
 Jika user minta mengerjakan beberapa isu secara paralel menggunakan subagent:
@@ -84,41 +73,40 @@ Jika user minta mengerjakan beberapa isu secara paralel menggunakan subagent:
 - Setiap subagent harus buat branch sendiri dari `main` terbaru
 
 ### Saat mulai kerja (WAJIB):
-1. Update Linear issue status → **"In Progress"**
-2. Update Notion task:
+1. Update Notion task:
    - **Status** → "In Progress"
    - **Priority** → set P1/P2/P3 (tanya user jika belum di-set)
    - **Type** → auto dari branch prefix: `feature/` → Feature, `fix/` → Bug, `chore/` → Chore
-   - **Due** → set target deadline (tanya user jika belum di-set) — harus sama dengan dueDate di Linear
+   - **Due** → set target deadline (tanya user jika belum di-set)
    - **Initiative** → link ke initiative yang relevan (tanya user jika belum di-set)
    - **Next action** → "Coding"
 
-3. **Revalidasi Issue (WAJIB sebelum coding):**
+2. **Revalidasi Issue (WAJIB sebelum coding):**
    - Baca codebase terkini di area yang akan diubah — jangan langsung coding berdasarkan deskripsi issue saja
    - Cek `git log --oneline` untuk PR yang sudah merged sejak issue dibuat — apakah ada perubahan yang mempengaruhi approach?
-   - Bandingkan kondisi codebase sekarang dengan suggested approach di deskripsi issue (Linear + Notion)
+   - Bandingkan kondisi codebase sekarang dengan suggested approach di konten page Notion
    - **Jika approach sudah tidak relevan:**
-     - Update deskripsi issue di Linear DAN konten page Notion dengan approach baru
+     - Update di konten page Notion dengan approach baru
      - Tambahkan catatan: "Approach diubah — codebase sudah berevolusi sejak issue dibuat [detail perubahan]"
    - **Jika scope berubah** (terlalu besar/kecil setelah revalidasi):
      - Split atau merge issue sesuai kebutuhan
-     - Update parent-child relationship di Linear dan Notion
+     - Update parent-child relationship di Notion dan GitHub Issues
    - Jika tidak ada perubahan signifikan, lanjut ke step berikutnya
 
-4. Buat branch dari `main` dengan format di bawah
+3. Buat branch dari `main` dengan format di bawah
 
 ### Branch naming:
 ```
 main → stable release — NEVER push directly
-feature/DAS-{ID}-desc → fitur baru
-fix/DAS-{ID}-desc → bug fix
-chore/DAS-{ID}-desc → maintenance
-docs/DAS-{ID}-desc → dokumentasi
-benchmark/DAS-{ID}-desc → benchmark test baru
+feature/GH-{N}-desc  → fitur baru
+fix/GH-{N}-desc      → bug fix
+chore/GH-{N}-desc    → maintenance
+docs/GH-{N}-desc     → dokumentasi
+benchmark/GH-{N}-desc → benchmark test baru
 ```
 
 ### Saat selesai coding:
-1. Commit: `DAS-{ID}: deskripsi perubahan`
+1. Commit: `GH-{N}: deskripsi perubahan`
 
 2. **Codex Code Review (WAJIB sebelum buat PR):**
    - Spawn Codex agent untuk review hasil kerja sebelum PR dibuat
@@ -136,7 +124,7 @@ benchmark/DAS-{ID}-desc → benchmark test baru
    - Jika Codex menemukan critical issue → fix sebelum buat PR
    - Jika Codex menemukan medium/low issue → fix atau catat sebagai tech-debt
 
-3. Buat PR sebagai **Draft** — title harus include `DAS-{ID}` (uppercase)
+3. Buat PR sebagai **Draft** — title harus include identifier (`GH-{N}` untuk isu baru, atau `DAS-{ID}` untuk isu lama) (uppercase)
    - Gunakan `gh pr create --draft` agar CI tidak jalan sampai siap
    - Sertakan `Closes #{github_issue_number}` di body PR agar GitHub Issue ter-close otomatis saat merge
    - Push semua fix dari Codex review, address review comments, dll selama masih draft (CI tidak jalan = hemat minutes)
@@ -210,7 +198,6 @@ Gunakan `/loop 3m` untuk polling otomatis setiap 3 menit sampai semua selesai.
 Setelah user merge PR (atau issue di-close), lakukan cleanup & sync:
 
 1. **Verify status sinkron:**
-   - Linear status harus "Done" (biasanya otomatis via Linear bot saat PR merged)
    - Notion status harus "Done" (biasanya otomatis via `notion-sync.yml` GH Actions)
    - GitHub Issue harus "closed" (otomatis via `Closes #N` di PR body — jika tidak, close manual: `gh issue close {number} --repo rachmad-jenss/haul-pave`)
    - Jika salah satu belum terupdate, **update manual**
@@ -219,14 +206,12 @@ Setelah user merge PR (atau issue di-close), lakukan cleanup & sync:
    - Tambahkan di konten page: link ke PR, summary perubahan, dan catatan penting
    - Format: `## PR Merged\n- PR: #XX (link)\n- Summary: deskripsi singkat apa yang diubah\n- Catatan: hal penting yang perlu diketahui`
 
-3. **Update Linear issue** jika ada info baru:
-   - Jika ada temuan/catatan selama development yang belum ada di description, update description Linear
-   - Tambahkan link PR di Linear issue (biasanya otomatis via Linear GitHub integration)
+3. *(Linear paused — skip. Saat aktif kembali: pastikan Linear issue ter-update ke Done dan PR ter-link.)*
 
 4. **Update Notion Next action** → kosong (task selesai)
 
 5. **Cek parent issue:**
-   - Jika semua sub-tasks dari parent issue sudah Done, update parent issue juga ke Done (di Linear dan Notion)
+   - Jika semua sub-tasks dari parent issue sudah Done, update parent issue juga ke Done (di Notion dan GitHub Issues)
    - Jika belum semua selesai, biarkan parent tetap In Progress
 
 ### Jika blocked:
@@ -235,7 +220,7 @@ Setelah user merge PR (atau issue di-close), lakukan cleanup & sync:
 - Setelah unblocked, kembalikan Status ke "In Progress" dan update Next action sesuai fase saat ini
 
 ### Notion Tasks Convention:
-- Title selalu diawali `[DAS-{ID}]` — contoh: `[DAS-XX] Implement CESA calculation`
+- Title selalu diawali `[GH-{N}]` untuk isu baru, `[DAS-{ID}]` untuk isu lama — contoh: `[GH-XX] Implement CESA calculation`
 - Wajib isi **Product/App** → `HaulPave — Library`
 - Wajib isi **Repo** → `haul-pave`
 
