@@ -29,6 +29,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+ConfidenceLabel = Literal["benchmark_tested", "method_implemented", "experimental"]
+
 __all__ = ["ComparisonResult", "RoadScenario", "ScenarioComparison", "compare_scenarios"]
 
 # Rolling resistance as fractions by surface type
@@ -63,6 +65,7 @@ class ScenarioComparison(BaseModel):
     tire_cost_usd_per_year: float = Field(ge=0)
     fuel_cost_usd_per_year: float = Field(ge=0)
     maintenance_cost_usd_per_year: float = Field(ge=0)
+    confidence: ConfidenceLabel = "experimental"
 
 
 class ComparisonResult(BaseModel):
@@ -72,6 +75,7 @@ class ComparisonResult(BaseModel):
 
     scenarios: list[ScenarioComparison]
     method: str = "haulpave-economics-rr-v1"
+    confidence: ConfidenceLabel = "experimental"
 
 
 def compare_scenarios(

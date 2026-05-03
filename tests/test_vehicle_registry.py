@@ -38,6 +38,26 @@ class TestListAll:
                 f"{entry.id}: axle loads sum {total:.1f} != gvw_kn {entry.gvw_kn:.1f}"
             )
 
+    def test_front_axle_is_25_percent(self) -> None:
+        """Front single-axle load must be within 0.2 % of 25 % GVW."""
+        for entry in list_all():
+            front = entry.vehicle.axle_groups[0].gross_load_kn
+            expected = entry.gvw_kn * 0.25
+            assert abs(front - expected) / expected < 0.002, (
+                f"{entry.id}: front axle {front:.1f} kN deviates from 25% of GVW "
+                f"({expected:.1f} kN) by more than 0.2%"
+            )
+
+    def test_rear_axle_is_75_percent(self) -> None:
+        """Rear tandem load must be within 0.2 % of 75 % GVW."""
+        for entry in list_all():
+            rear = entry.vehicle.axle_groups[1].gross_load_kn
+            expected = entry.gvw_kn * 0.75
+            assert abs(rear - expected) / expected < 0.002, (
+                f"{entry.id}: rear axle {rear:.1f} kN deviates from 75% of GVW "
+                f"({expected:.1f} kN) by more than 0.2%"
+            )
+
     def test_cat_797f_heaviest(self) -> None:
         by_id = {v.id: v for v in list_all()}
         assert by_id["cat-797f"].gvw_kn > by_id["cat-785d"].gvw_kn
