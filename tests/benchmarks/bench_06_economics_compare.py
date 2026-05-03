@@ -81,12 +81,27 @@ def _assert_close(computed: float, expected: float, label: str) -> None:
 @pytest.fixture()
 def three_surface_scenarios() -> list[RoadScenario]:
     return [
-        RoadScenario(name="Asphalt", surface="asphalt", thickness_mm=100,
-                     haul_distance_km=HAUL_KM, trips_per_day=TRIPS_PER_DAY),
-        RoadScenario(name="Gravel", surface="gravel", thickness_mm=600,
-                     haul_distance_km=HAUL_KM, trips_per_day=TRIPS_PER_DAY),
-        RoadScenario(name="Concrete", surface="concrete", thickness_mm=200,
-                     haul_distance_km=HAUL_KM, trips_per_day=TRIPS_PER_DAY),
+        RoadScenario(
+            name="Asphalt",
+            surface="asphalt",
+            thickness_mm=100,
+            haul_distance_km=HAUL_KM,
+            trips_per_day=TRIPS_PER_DAY,
+        ),
+        RoadScenario(
+            name="Gravel",
+            surface="gravel",
+            thickness_mm=600,
+            haul_distance_km=HAUL_KM,
+            trips_per_day=TRIPS_PER_DAY,
+        ),
+        RoadScenario(
+            name="Concrete",
+            surface="concrete",
+            thickness_mm=200,
+            haul_distance_km=HAUL_KM,
+            trips_per_day=TRIPS_PER_DAY,
+        ),
     ]
 
 
@@ -155,9 +170,7 @@ class TestConcreteBenchmark:
         result = compare_scenarios(three_surface_scenarios)
         concrete = next(s for s in result.scenarios if s.name == "Concrete")
         expected = _REF["scenarios"]["concrete"]["tire_cost_usd_per_year"]
-        _assert_close(
-            concrete.tire_cost_usd_per_year, expected, "Concrete tire_cost_usd_per_year"
-        )
+        _assert_close(concrete.tire_cost_usd_per_year, expected, "Concrete tire_cost_usd_per_year")
 
     def test_maintenance_cost(self, three_surface_scenarios: list[RoadScenario]) -> None:
         result = compare_scenarios(three_surface_scenarios)
@@ -187,9 +200,7 @@ class TestOrderingInvariants:
             by_name["Asphalt"].fuel_cost_usd_per_year > by_name["Concrete"].fuel_cost_usd_per_year
         )
 
-    def test_gravel_tyre_exceeds_asphalt(
-        self, three_surface_scenarios: list[RoadScenario]
-    ) -> None:
+    def test_gravel_tyre_exceeds_asphalt(self, three_surface_scenarios: list[RoadScenario]) -> None:
         result = compare_scenarios(three_surface_scenarios)
         by_name = {s.name: s for s in result.scenarios}
         assert by_name["Gravel"].tire_cost_usd_per_year > by_name["Asphalt"].tire_cost_usd_per_year
@@ -204,34 +215,41 @@ class TestOrderingInvariants:
             > by_name["Asphalt"].maintenance_cost_usd_per_year
         )
 
-    def test_result_count_matches_input(
-        self, three_surface_scenarios: list[RoadScenario]
-    ) -> None:
+    def test_result_count_matches_input(self, three_surface_scenarios: list[RoadScenario]) -> None:
         result = compare_scenarios(three_surface_scenarios)
         assert len(result.scenarios) == len(three_surface_scenarios)
 
-    def test_scenario_names_preserved(
-        self, three_surface_scenarios: list[RoadScenario]
-    ) -> None:
+    def test_scenario_names_preserved(self, three_surface_scenarios: list[RoadScenario]) -> None:
         result = compare_scenarios(three_surface_scenarios)
         names = [s.name for s in result.scenarios]
         assert names == ["Asphalt", "Gravel", "Concrete"]
 
     def test_distance_scaling(self) -> None:
         """Doubling haul distance exactly doubles all annual costs."""
-        base = [RoadScenario(
-            name="A", surface="asphalt", thickness_mm=100,
-            haul_distance_km=5.0, trips_per_day=20,
-        )]
-        double = [RoadScenario(
-            name="A", surface="asphalt", thickness_mm=100,
-            haul_distance_km=10.0, trips_per_day=20,
-        )]
+        base = [
+            RoadScenario(
+                name="A",
+                surface="asphalt",
+                thickness_mm=100,
+                haul_distance_km=5.0,
+                trips_per_day=20,
+            )
+        ]
+        double = [
+            RoadScenario(
+                name="A",
+                surface="asphalt",
+                thickness_mm=100,
+                haul_distance_km=10.0,
+                trips_per_day=20,
+            )
+        ]
         r_base = compare_scenarios(base)
         r_double = compare_scenarios(double)
         s0 = r_base.scenarios[0]
         s1 = r_double.scenarios[0]
         import math
+
         assert math.isclose(s1.fuel_cost_usd_per_year, s0.fuel_cost_usd_per_year * 2, rel_tol=1e-9)
         assert math.isclose(s1.tire_cost_usd_per_year, s0.tire_cost_usd_per_year * 2, rel_tol=1e-9)
         assert math.isclose(

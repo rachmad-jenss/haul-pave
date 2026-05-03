@@ -124,6 +124,7 @@ def design_pavement(
 # layer instead of a full TrafficInput (used by haul-calc bridge.py).
 # ---------------------------------------------------------------------------
 
+
 def cbr_thickness_from_coverages(
     subgrade_cbr: float,
     design_coverages: float,

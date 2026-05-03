@@ -10,10 +10,20 @@ from haulpave.economics.compare import ComparisonResult, RoadScenario, compare_s
 @pytest.fixture()
 def two_scenarios() -> list[RoadScenario]:
     return [
-        RoadScenario(name="Asphalt", surface="asphalt", thickness_mm=100,
-                     haul_distance_km=5.0, trips_per_day=20),
-        RoadScenario(name="Gravel", surface="gravel", thickness_mm=600,
-                     haul_distance_km=5.0, trips_per_day=20),
+        RoadScenario(
+            name="Asphalt",
+            surface="asphalt",
+            thickness_mm=100,
+            haul_distance_km=5.0,
+            trips_per_day=20,
+        ),
+        RoadScenario(
+            name="Gravel",
+            surface="gravel",
+            thickness_mm=600,
+            haul_distance_km=5.0,
+            trips_per_day=20,
+        ),
     ]
 
 
@@ -23,9 +33,7 @@ class TestCompareScenarios:
         assert isinstance(result, ComparisonResult)
         assert len(result.scenarios) == 2
 
-    def test_gravel_more_expensive_than_asphalt(
-        self, two_scenarios: list[RoadScenario]
-    ) -> None:
+    def test_gravel_more_expensive_than_asphalt(self, two_scenarios: list[RoadScenario]) -> None:
         result = compare_scenarios(two_scenarios)
         asphalt = result.scenarios[0]
         gravel = result.scenarios[1]
@@ -54,12 +62,19 @@ class TestCompareScenarios:
 
     def test_concrete_cheapest(self) -> None:
         scenarios = [
-            RoadScenario(name="A", surface="asphalt", thickness_mm=100,
-                         haul_distance_km=10, trips_per_day=10),
-            RoadScenario(name="G", surface="gravel", thickness_mm=600,
-                         haul_distance_km=10, trips_per_day=10),
-            RoadScenario(name="C", surface="concrete", thickness_mm=200,
-                         haul_distance_km=10, trips_per_day=10),
+            RoadScenario(
+                name="A", surface="asphalt", thickness_mm=100, haul_distance_km=10, trips_per_day=10
+            ),
+            RoadScenario(
+                name="G", surface="gravel", thickness_mm=600, haul_distance_km=10, trips_per_day=10
+            ),
+            RoadScenario(
+                name="C",
+                surface="concrete",
+                thickness_mm=200,
+                haul_distance_km=10,
+                trips_per_day=10,
+            ),
         ]
         result = compare_scenarios(scenarios)
         by_name = {s.name: s for s in result.scenarios}

@@ -52,12 +52,8 @@ def _make_truck(
         name=name,
         gross_vehicle_mass_t=round(gvw_kn / 9.81, 1),
         axle_groups=[
-            AxleGroup(
-                axle_count=1, tyres_per_axle=2, gross_load_kn=front_kn, tire_spec=_OTR_TIRE
-            ),
-            AxleGroup(
-                axle_count=2, tyres_per_axle=4, gross_load_kn=rear_kn, tire_spec=_OTR_TIRE
-            ),
+            AxleGroup(axle_count=1, tyres_per_axle=2, gross_load_kn=front_kn, tire_spec=_OTR_TIRE),
+            AxleGroup(axle_count=2, tyres_per_axle=4, gross_load_kn=rear_kn, tire_spec=_OTR_TIRE),
         ],
         source=source,
     )

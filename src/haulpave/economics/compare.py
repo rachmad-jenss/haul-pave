@@ -108,9 +108,7 @@ def compare_scenarios(
     if working_days_per_year <= 0:
         raise ValueError(f"working_days_per_year must be > 0, got {working_days_per_year}")
     if fuel_price_usd_per_litre <= 0:
-        raise ValueError(
-            f"fuel_price_usd_per_litre must be > 0, got {fuel_price_usd_per_litre}"
-        )
+        raise ValueError(f"fuel_price_usd_per_litre must be > 0, got {fuel_price_usd_per_litre}")
 
     comparisons: list[ScenarioComparison] = []
     for s in scenarios:
