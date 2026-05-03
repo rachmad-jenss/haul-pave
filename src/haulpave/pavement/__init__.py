@@ -26,7 +26,14 @@ from haulpave.traffic.cesa import compute_cesa
 from haulpave.traffic.coverages import compute_coverages
 from haulpave.utils.interpolation import interpolate_thickness, load_curve_data
 
-__all__ = ["ComparisonResult", "PavementResult", "compare_methods", "design_pavement"]
+__all__ = [
+    "ComparisonResult",
+    "PavementResult",
+    "compare_methods",
+    "design_pavement",
+    "cbr_thickness_from_coverages",
+    "trh14_thickness_from_coverages",
+]
 
 
 @dataclass(frozen=True)
@@ -112,6 +119,103 @@ def design_pavement(
     )
 
 
+# ---------------------------------------------------------------------------
+# Bridge adapter functions — accept pre-computed design_coverages from the RPC
+# layer instead of a full TrafficInput (used by haul-calc bridge.py).
+# ---------------------------------------------------------------------------
+
+
+def cbr_thickness_from_coverages(
+    subgrade_cbr: float,
+    design_coverages: float,
+    curve_id: str = "usace_cbr_v1",
+) -> float:
+    """Return required CBR pavement thickness from pre-computed design coverages.
+
+    Unlike :func:`design_pavement`, this adapter skips the CESA / coverages
+    pipeline and feeds ``design_coverages`` directly into the USACE CBR curve
+    interpolation.  Intended for use by the haul-calc JSON-RPC bridge when the
+    front-end supplies ``design_coverages`` directly.
+
+    Parameters
+    ----------
+    subgrade_cbr:
+        Subgrade CBR [%].  Must be within the supported curve range.
+    design_coverages:
+        Pre-computed design coverages (equivalent wheel passes).  Must be > 0.
+    curve_id:
+        Digitized curve dataset identifier (default ``"usace_cbr_v1"``).
+
+    Returns
+    -------
+    float
+        Required total pavement thickness [mm].
+    """
+    curve_data = load_curve_data(curve_id)
+    return interpolate_thickness(curve_data, cbr=subgrade_cbr, coverages=design_coverages)
+
+
+def trh14_thickness_from_coverages(
+    subgrade_cbr: float,
+    design_coverages: float,
+) -> TRH14Result:
+    """Return TRH 14 pavement thickness from subgrade CBR and pre-computed coverages.
+
+    Adapter for the haul-calc JSON-RPC bridge: accepts raw ``design_coverages``
+    directly instead of computing them from a ``TrafficInput``.
+
+    Parameters
+    ----------
+    subgrade_cbr:
+        Subgrade CBR [%].  Must be ≥ 0.
+    design_coverages:
+        Pre-computed design coverages.  Must be > 0.
+
+    Returns
+    -------
+    TRH14Result
+        Frozen dataclass with material class, thickness, and input coverages.
+
+    Raises
+    ------
+    ValueError
+        If ``subgrade_cbr`` < 0, or the resulting G-class (G8/G9) is not in
+        the TRH 14 design catalog.
+    """
+    from haulpave.pavement.trh14 import (
+        TRH14Result,
+        _interpolate_catalog,
+        _load_catalog,
+        cbr_to_material_class,
+    )
+
+    if design_coverages <= 0:
+        raise ValueError(f"design_coverages must be > 0, got {design_coverages}")
+
+    g_class = cbr_to_material_class(subgrade_cbr)
+    catalog = _load_catalog()
+    thickness_table: dict[str, list[float]] = catalog["thickness_mm"]
+
+    if g_class not in thickness_table:
+        raise ValueError(
+            f"Subgrade G-class '{g_class}' (CBR={subgrade_cbr}%) is not in the TRH 14 "
+            f"design catalog. Improve the subgrade to at least G7 (CBR ≥ 2%)."
+        )
+
+    coverage_levels: list[int] = catalog["coverage_levels"]
+    thickness_values: list[float] = thickness_table[g_class]
+    thickness = _interpolate_catalog(thickness_values, coverage_levels, design_coverages)
+
+    return TRH14Result(
+        material_class=g_class,
+        total_thickness_mm=thickness,
+        total_coverages=design_coverages,
+        design_wheel_load_kn=0.0,  # unknown when using pre-computed coverages
+    )
+
+
+# Type alias kept at module level to avoid circular import in annotations above
 # Bottom import — avoids circular dependency: compare.py imports PavementResult
 # and design_pavement from this module (already defined above by this point).
 from haulpave.pavement.compare import ComparisonResult, compare_methods  # noqa: E402
+from haulpave.pavement.trh14 import TRH14Result  # noqa: E402

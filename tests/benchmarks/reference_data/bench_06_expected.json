@@ -1,0 +1,84 @@
+{
+  "metadata": {
+    "description": "Economics compare_scenarios hand-calc — RR linear cost model",
+    "method": "Rolling-resistance linear cost model (haul-pave-economics-rr-v1)",
+    "rr_coefficients": {
+      "asphalt": 0.015,
+      "gravel": 0.040,
+      "concrete": 0.012
+    },
+    "model_equations": {
+      "fuel_l_per_km": "2.042 + 29.2 * RR",
+      "tyre_usd_per_km": "0.128 + 92.8 * RR",
+      "maint_usd_per_km": "0.144 + 30.4 * RR"
+    },
+    "default_fuel_price_usd_per_litre": 0.80,
+    "default_working_days_per_year": 250,
+    "tolerance_pct": 0.1,
+    "hand_calculated_date": "2026-05-03",
+    "test_scenario": {
+      "haul_distance_km": 10.0,
+      "trips_per_day": 40.0,
+      "km_per_year": 100000.0
+    }
+  },
+  "scenarios": {
+    "asphalt": {
+      "rr": 0.015,
+      "fuel_l_per_km": 2.48,
+      "tyre_usd_per_km": 1.52,
+      "maint_usd_per_km": 0.6,
+      "fuel_cost_usd_per_year": 198400.0,
+      "tire_cost_usd_per_year": 152000.0,
+      "maintenance_cost_usd_per_year": 60000.0,
+      "workings": {
+        "fuel_l_per_km": "2.042 + 29.2 * 0.015 = 2.042 + 0.438 = 2.480",
+        "tyre_usd_per_km": "0.128 + 92.8 * 0.015 = 0.128 + 1.392 = 1.520",
+        "maint_usd_per_km": "0.144 + 30.4 * 0.015 = 0.144 + 0.456 = 0.600",
+        "fuel_cost": "2.480 * 0.80 * 100000 = 198,400",
+        "tyre_cost": "1.520 * 100000 = 152,000",
+        "maint_cost": "0.600 * 100000 = 60,000"
+      }
+    },
+    "gravel": {
+      "rr": 0.040,
+      "fuel_l_per_km": 3.21,
+      "tyre_usd_per_km": 3.84,
+      "maint_usd_per_km": 1.36,
+      "fuel_cost_usd_per_year": 256800.0,
+      "tire_cost_usd_per_year": 384000.0,
+      "maintenance_cost_usd_per_year": 136000.0,
+      "workings": {
+        "fuel_l_per_km": "2.042 + 29.2 * 0.040 = 2.042 + 1.168 = 3.210",
+        "tyre_usd_per_km": "0.128 + 92.8 * 0.040 = 0.128 + 3.712 = 3.840",
+        "maint_usd_per_km": "0.144 + 30.4 * 0.040 = 0.144 + 1.216 = 1.360",
+        "fuel_cost": "3.210 * 0.80 * 100000 = 256,800",
+        "tyre_cost": "3.840 * 100000 = 384,000",
+        "maint_cost": "1.360 * 100000 = 136,000"
+      }
+    },
+    "concrete": {
+      "rr": 0.012,
+      "fuel_l_per_km": 2.3924,
+      "tyre_usd_per_km": 1.2416,
+      "maint_usd_per_km": 0.5088,
+      "fuel_cost_usd_per_year": 191392.0,
+      "tire_cost_usd_per_year": 124160.0,
+      "maintenance_cost_usd_per_year": 50880.0,
+      "workings": {
+        "fuel_l_per_km": "2.042 + 29.2 * 0.012 = 2.042 + 0.3504 = 2.3924",
+        "tyre_usd_per_km": "0.128 + 92.8 * 0.012 = 0.128 + 1.1136 = 1.2416",
+        "maint_usd_per_km": "0.144 + 30.4 * 0.012 = 0.144 + 0.3648 = 0.5088",
+        "fuel_cost": "2.3924 * 0.80 * 100000 = 191,392",
+        "tyre_cost": "1.2416 * 100000 = 124,160",
+        "maint_cost": "0.5088 * 100000 = 50,880"
+      }
+    }
+  },
+  "ordering_invariants": {
+    "fuel_cost": "concrete < asphalt < gravel",
+    "tyre_cost": "concrete < asphalt < gravel",
+    "maint_cost": "concrete < asphalt < gravel",
+    "note": "Lower RR always → lower cost in all categories — no trade-off"
+  }
+}
