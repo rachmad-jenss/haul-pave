@@ -7,6 +7,21 @@ HaulPave uses [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.0] — 2026-05-03
+
+### Added
+- **Vehicle registry** (`haulpave.vehicle_registry`): `list_all()`, `find_by_id()` with 4 OEM mining trucks — CAT 797F (6104 kN), KOM 960E (5925 kN), CAT 789D (3304 kN), CAT 785D (2641 kN). Axle loads follow 25/75 front/rear split per CAT Performance Handbook Ed. 47 (DAS-267)
+- **Economics compare** (`haulpave.economics.compare_scenarios`): rolling-resistance linear cost model for tire, fuel, and maintenance cost per year across `asphalt`, `gravel`, and `concrete` surfaces. Physics-verified ordering: gravel > asphalt > concrete for all cost categories. Benchmark 06 added (DAS-268)
+- **Reporting summary** (`haulpave.reporting.build_design_summary`): versioned design summary envelope with UTC timestamp, package version, inputs dict, and results dict (DAS-269)
+- **Pavement bridge adapters**: `cbr_thickness_from_coverages()` and `trh14_thickness_from_coverages()` — bypass `TrafficInput` pipeline for callers that already have design coverages
+
+### Technical
+- 269 unit + benchmark tests, 98.39% coverage
+- `ConfidenceLabel` type added to `ScenarioComparison` and `ComparisonResult` — all new results carry `experimental` label
+- Benchmark 06 reference data: hand-calculated at 10 km, 40 trips/day, 250 days/yr; tolerance 0.1%
+
+---
+
 ## [0.2.0] — 2026-03-25
 
 ### Added
