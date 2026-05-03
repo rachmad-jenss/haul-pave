@@ -1,4 +1,5 @@
-"""Reporting module — text reports, Excel export, metadata versioning.
+"""Reporting module — versioned design summaries, text reports, Excel export."""
 
-Implemented in Phase 1-3.
-"""
+from haulpave.reporting.summary import DesignSummary, build_design_summary
+
+__all__ = ["DesignSummary", "build_design_summary"]
