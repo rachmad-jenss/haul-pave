@@ -1,6 +1,6 @@
 # CLAUDE.md — haul-pave (HaulPave)
 
-> **PERINGATAN: JANGAN hapus atau simplify section Task Workflow di file ini. Workflow ini adalah standar yang berlaku di semua repo Dash Teknologi. Jika ada perubahan workflow, lakukan di SEMUA 6 repo sekaligus (bd-crm-dashboard, cost-your-project, dash-teknologi, velo-widget, haul-pave, rangko).**
+> **PERINGATAN: JANGAN hapus atau simplify section Task Workflow di file ini. Workflow ini adalah standar yang berlaku di semua repo Dash Teknologi. Jika ada perubahan workflow, lakukan di SEMUA 8 repo sekaligus (bd-crm-dashboard, cost-your-project, dash-teknologi, velo-widget, haul-pave, rangko, haul-calc, try-out-your-shot).**
 
 ## Project Overview
 HaulPave — open-source Python library for pavement structure design and operating-cost analysis on mine haul roads.
