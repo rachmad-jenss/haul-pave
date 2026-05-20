@@ -79,11 +79,18 @@ def main() -> None:
         working_days_per_year=250,
     )
 
-    print(f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}")
+    print(
+        f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}"
+        f"  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}"
+    )
     print(f"{'-'*10}  {'-'*14}  {'-'*14}  {'-'*14}  {'-'*14}")
 
     for sc in comp.scenarios:
-        total = sc.fuel_cost_usd_per_year + sc.tire_cost_usd_per_year + sc.maintenance_cost_usd_per_year
+        total = (
+            sc.fuel_cost_usd_per_year
+            + sc.tire_cost_usd_per_year
+            + sc.maintenance_cost_usd_per_year
+        )
         print(
             f"{sc.name:>10}  {sc.fuel_cost_usd_per_year:>14,.0f}  "
             f"{sc.tire_cost_usd_per_year:>14,.0f}  "
