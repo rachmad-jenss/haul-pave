@@ -105,6 +105,24 @@ class TestDesign:
         assert "required_thickness_mm" in data
         assert data["required_thickness_mm"] > 0
 
+    def test_missing_input_file(self) -> None:
+        result = runner.invoke(app, ["design", "-i", "nonexistent.json", "--cbr", "10"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, FileNotFoundError)
+
+    def test_invalid_json_input(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text("{invalid json}")
+        result = runner.invoke(app, ["design", "-i", str(bad), "--cbr", "10"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, json.JSONDecodeError)
+
+    def test_invalid_cbr_value(self, traffic_json: Path) -> None:
+        result = runner.invoke(app, ["design", "-i", str(traffic_json), "--cbr", "0.5"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, ValueError)
+        assert "CBR" in str(result.exception)
+
 
 class TestCompare:
     def test_compare_text(self, traffic_json: Path) -> None:
@@ -119,6 +137,21 @@ class TestCompare:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "delta_mm" in data
+
+
+class TestMissingArgs:
+    def test_design_missing_required(self) -> None:
+        result = runner.invoke(app, ["design"])
+        assert result.exit_code == 2
+        assert (
+            "Error" in result.output
+            or "option" in result.output.lower()
+            or "required" in result.output.lower()
+        )
+
+    def test_cesa_missing_input(self) -> None:
+        result = runner.invoke(app, ["cesa"])
+        assert result.exit_code == 2
 
 
 class TestCliHelp:
