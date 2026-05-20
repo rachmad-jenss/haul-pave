@@ -13,7 +13,12 @@ import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
-from haulpave.pavement.trh14 import TRH14Result, _interpolate_catalog, cbr_to_material_class, compute_trh14
+from haulpave.pavement.trh14 import (
+    TRH14Result,
+    _interpolate_catalog,
+    cbr_to_material_class,
+    compute_trh14,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers

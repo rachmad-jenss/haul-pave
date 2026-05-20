@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from pydantic import ValidationError
 
 from haulpave.reporting.summary import DesignSummary, build_design_summary
