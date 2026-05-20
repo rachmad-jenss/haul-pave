@@ -50,6 +50,11 @@ class TestBuildDesignSummary:
         b = build_design_summary(inputs={"coverages": 5000, "cbr": 10})
         assert a.input_hash == b.input_hash
 
+    def test_immutable(self) -> None:
+        result = build_design_summary(inputs={"cbr": 10})
+        with pytest.raises((AttributeError, TypeError, ValidationError)):
+            result.title = "Changed"  # type: ignore[misc]
+
 
 class TestComputeInputHash:
     def test_returns_hex_string(self) -> None:
