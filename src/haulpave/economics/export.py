@@ -26,8 +26,8 @@ def export_comparison_to_excel(comparison: ComparisonResult, filepath: str | Pat
     str
         The resolved absolute path of the created file.
     """
-    import openpyxl
-    from openpyxl.styles import Alignment, Font, PatternFill
+    import openpyxl  # type: ignore[import-untyped]
+    from openpyxl.styles import Alignment, Font, PatternFill  # type: ignore[import-untyped]
 
     wb = openpyxl.Workbook()
     ws = wb.active
