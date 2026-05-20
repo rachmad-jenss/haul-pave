@@ -277,6 +277,7 @@ class TestScenario:
 
 class TestExport:
     def test_export_creates_file(self, roads_json: Path, tmp_path: Path) -> None:
+        pytest.importorskip("openpyxl")
         out = tmp_path / "results.xlsx"
         result = runner.invoke(
             app, ["export", "-i", str(roads_json), "-o", str(out)]

@@ -233,8 +233,16 @@ def export(
     working_days: _WorkingDays = 250,
 ) -> None:
     """Export scenario comparison to an Excel (.xlsx) workbook."""
+    try:
+        from haulpave.economics.export import export_comparison_to_excel
+    except ImportError:
+        typer.echo(
+            "Error: openpyxl is required for Excel export."
+            "  Install with: pip install haulpave[excel]"
+        )
+        raise typer.Exit(code=1) from None
+
     from haulpave.economics.compare import RoadScenario, compare_scenarios
-    from haulpave.economics.export import export_comparison_to_excel
 
     with input_path.open(encoding="utf-8") as f:
         data: Any = json.load(f)
