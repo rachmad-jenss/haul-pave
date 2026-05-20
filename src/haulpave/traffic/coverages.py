@@ -33,7 +33,7 @@ Total design coverages
 -----------------------
   total_coverages = Σ_vehicle_types(equiv_passes/day) × working_days × design_life
 
-Confidence label: ``benchmark_tested`` — matches published hand-calc within ±2 %.
+Confidence label: ``high`` — matches published hand-calc within ±2 %.
 """
 
 from __future__ import annotations
@@ -66,9 +66,7 @@ class CoveragesResult:
     total_coverages: float
     design_wheel_load_kn: float
     method: str = "USACE TM 5-822-12 pass-count method"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "benchmark_tested"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def _wheel_load_kn(group: AxleGroup) -> float:

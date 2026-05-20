@@ -63,7 +63,7 @@ class TestCompareMethodsReturnType:
         assert result.curve_id == "usace_cbr_v1"
         assert "USACE" in result.method
         assert "TRH 14" in result.method
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
 
 # ---------------------------------------------------------------------------

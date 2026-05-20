@@ -43,9 +43,9 @@ class DesignResult(BaseModel):
     """Output of a pavement thickness design calculation.
 
     Confidence labels follow the project plan convention:
-    - ``benchmark_tested``: result matches a published hand-calculation benchmark
-    - ``method_implemented``: code faithfully implements the published method
-    - ``experimental``: adaptation or extension not yet benchmark-tested
+    - ``high``: result matches a published hand-calculation benchmark
+    - ``medium``: code faithfully implements the published method
+    - ``low``: adaptation or extension not yet benchmark-tested
     """
 
     model_config = ConfigDict(frozen=True)
@@ -53,7 +53,7 @@ class DesignResult(BaseModel):
     pavement_structure: PavementStructure
     subgrade: SubgradeInfo
     design_coverages: float = Field(ge=0, description="Design coverages used")
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = Field(
+    confidence: Literal["high", "medium", "low"] = Field(
         description="Confidence label per project plan §4.3"
     )
 

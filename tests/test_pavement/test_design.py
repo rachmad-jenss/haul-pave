@@ -96,14 +96,14 @@ class TestPavementResult:
         assert "AASHTO" in result.method
 
     def test_result_default_confidence(self) -> None:
-        """Default confidence must be 'benchmark_tested'."""
+        """Default confidence must be 'high'."""
         result = PavementResult(
             total_cesa=1.0,
             total_coverages=1.0,
             required_thickness_mm=300.0,
             design_wheel_load_kn=80.0,
         )
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
     def test_result_fields_accessible(self) -> None:
         """All fields are directly accessible on the result."""
@@ -112,11 +112,41 @@ class TestPavementResult:
             total_coverages=530_357.24,
             required_thickness_mm=564.49,
             design_wheel_load_kn=112.5,
+            total_thickness_mm=564.49,
+            subgrade_cbr=7.0,
         )
         assert result.total_cesa == pytest.approx(508_634_682.58, rel=1e-6)
         assert result.total_coverages == pytest.approx(530_357.24, rel=1e-6)
         assert result.required_thickness_mm == pytest.approx(564.49, rel=1e-6)
         assert result.design_wheel_load_kn == pytest.approx(112.5, rel=1e-6)
+        assert result.total_thickness_mm == pytest.approx(564.49, rel=1e-6)
+        assert result.subgrade_cbr == pytest.approx(7.0)
+        assert result.layers == ()
+        assert not result.was_clamped
+
+    def test_total_thickness_mm_matches_required(self) -> None:
+        """total_thickness_mm must equal required_thickness_mm."""
+        result = PavementResult(
+            total_cesa=1.0,
+            total_coverages=1.0,
+            required_thickness_mm=300.0,
+            design_wheel_load_kn=80.0,
+            total_thickness_mm=300.0,
+        )
+        assert result.total_thickness_mm == result.required_thickness_mm
+
+    def test_was_clamped_flag_from_design(self, fleet_b_traffic: TrafficInput) -> None:
+        """Fleet B coverages exceed curve max — was_clamped must be True."""
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=fleet_b_traffic,
+                subgrade_cbr=7.0,
+                curve_id="usace_cbr_v1",
+            )
+        assert result.was_clamped
 
 
 # ---------------------------------------------------------------------------

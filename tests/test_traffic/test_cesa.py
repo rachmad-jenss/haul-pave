@@ -97,10 +97,10 @@ class TestCesaResultMetadata:
         result = compute_cesa(make_traffic(vehicle))
         assert "4th" in result.method or "4th" in result.method.lower()
 
-    def test_confidence_is_benchmark_tested(self) -> None:
+    def test_confidence_is_high(self) -> None:
         vehicle = make_vehicle("V", [make_single_axle(80.0)])
         result = compute_cesa(make_traffic(vehicle))
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
     def test_result_is_immutable(self) -> None:
         """CesaResult is a frozen dataclass — mutation must raise."""

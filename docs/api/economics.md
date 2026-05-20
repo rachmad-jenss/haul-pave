@@ -40,7 +40,7 @@ class EconomicsResult:
     annual_cost: float
     currency: str
     method: str = "haulpave-economics-v1"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/economics/engine.py:29`
@@ -110,7 +110,7 @@ class ScenarioComparison(BaseModel):
     tire_cost_usd_per_year: float
     fuel_cost_usd_per_year: float
     maintenance_cost_usd_per_year: float
-    confidence: ConfidenceLabel = "experimental"
+    confidence: ConfidenceLabel = "low"
 ```
 
 **Source:** `src/haulpave/economics/compare.py:59`
@@ -123,7 +123,7 @@ class ScenarioComparison(BaseModel):
 class ComparisonResult(BaseModel):
     scenarios: list[ScenarioComparison]
     method: str = "haulpave-economics-rr-v1"
-    confidence: ConfidenceLabel = "experimental"
+    confidence: ConfidenceLabel = "low"
 ```
 
 **Source:** `src/haulpave/economics/compare.py:71`

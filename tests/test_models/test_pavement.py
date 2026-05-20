@@ -58,11 +58,11 @@ class TestDesignResult:
             pavement_structure=structure,
             subgrade=subgrade,
             design_coverages=1500.0,
-            confidence="benchmark_tested",
+            confidence="high",
             method_id="USACE-TM5-822-12",
             package_version="0.0.1",
         )
-        assert dr.confidence == "benchmark_tested"
+        assert dr.confidence == "high"
         assert dr.curve_version is None
         assert dr.input_hash is None
 
@@ -82,7 +82,7 @@ class TestDesignResult:
     def test_all_confidence_literals(
         self, structure: PavementStructure, subgrade: SubgradeInfo
     ) -> None:
-        for label in ("benchmark_tested", "method_implemented", "experimental"):
+        for label in ("high", "medium", "low"):
             dr = DesignResult(
                 pavement_structure=structure,
                 subgrade=subgrade,

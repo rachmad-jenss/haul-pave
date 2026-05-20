@@ -71,7 +71,7 @@ class TestCoveragesResult:
 
     def test_default_confidence(self) -> None:
         result = CoveragesResult(total_coverages=1000.0, design_wheel_load_kn=77.5)
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
     def test_fields_accessible(self) -> None:
         result = CoveragesResult(total_coverages=12345.6, design_wheel_load_kn=112.5)
@@ -381,11 +381,11 @@ class TestComputeCoverages:
             f"Expected ratio {expected_ratio:.6f}, got {actual_ratio:.6f}"
         )
 
-    def test_confidence_is_benchmark_tested(self) -> None:
+    def test_confidence_is_high(self) -> None:
         vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         result = compute_coverages(traffic)
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
     def test_positive_coverages(self) -> None:
         vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])

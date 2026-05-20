@@ -34,7 +34,7 @@ class PavementResult:
     required_thickness_mm: float
     design_wheel_load_kn: float
     method: str = "USACE TM 5-822-12 CBR design curves + AASHTO 4th-power LEF"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/pavement/__init__.py:40`
@@ -95,7 +95,7 @@ class TRH14Result:
     total_coverages: float
     design_wheel_load_kn: float
     method: str = "TRH 14 (CSRA 1985) design catalog + USACE design-coverages"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/pavement/trh14.py:161`
@@ -140,7 +140,7 @@ class ComparisonResult:
     subgrade_cbr: float
     curve_id: str
     method: str = "USACE TM 5-822-12 CBR vs TRH 14 (CSRA 1985) comparison"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/pavement/compare.py:39`
@@ -153,4 +153,4 @@ class ComparisonResult:
 | `subgrade_cbr` | Subgrade CBR [%] used for both calculations |
 | `curve_id` | USACE CBR curve dataset identifier |
 | `method` | Human-readable method identifier |
-| `confidence` | Confidence label (inherits `benchmark_tested` from sub-engines) |
+| `confidence` | Confidence label (inherits `high` from sub-engines) |

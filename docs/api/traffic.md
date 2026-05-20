@@ -28,7 +28,7 @@ Load Equivalency Factor (LEF) method.
 class CesaResult:
     total_cesa: float
     method: str = "AASHTO 4th-power LEF (AASHTO 1993)"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/traffic/cesa.py:45`
@@ -66,7 +66,7 @@ class CoveragesResult:
     total_coverages: float
     design_wheel_load_kn: float
     method: str = "USACE TM 5-822-12 pass-count method"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
 ```
 
 **Source:** `src/haulpave/traffic/coverages.py:51`
