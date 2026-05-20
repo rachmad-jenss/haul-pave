@@ -217,14 +217,15 @@ def trh14_thickness_from_coverages(
     )
 
 
-
 def __getattr__(name: str) -> Any:
     """Lazy re-export to break circular import between this module and compare."""
     if name in ("ComparisonResult", "compare_methods"):
         import haulpave.pavement.compare as _mod
+
         return getattr(_mod, name)
     if name == "TRH14Result":
         from haulpave.pavement.trh14 import TRH14Result
+
         return TRH14Result
     msg = f"module {__name__!r} has no attribute {name!r}"
     raise AttributeError(msg)
