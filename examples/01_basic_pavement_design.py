@@ -11,9 +11,9 @@ Run: python examples/01_basic_pavement_design.py
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
+from haulpave.pavement import design_pavement
 from haulpave.traffic.cesa import compute_cesa
 from haulpave.traffic.coverages import compute_coverages
-from haulpave.pavement import design_pavement
 
 
 def main() -> None:
@@ -53,25 +53,25 @@ def main() -> None:
         working_days_per_year=350,
     )
 
-    print(f"\nFleet:")
+    print("\nFleet:")
     for fu in traffic.fleet:
         print(f"  {fu.vehicle.name}: {fu.trips_per_day} trips/day")
 
     cesa_result = compute_cesa(traffic)
-    print(f"\n--- CESA (AASHTO 4th-power LEF) ---")
+    print("\n--- CESA (AASHTO 4th-power LEF) ---")
     print(f"  Total CESA:       {cesa_result.total_cesa:,.2f}")
     print(f"  Method:           {cesa_result.method}")
     print(f"  Confidence:       {cesa_result.confidence}")
 
     cov_result = compute_coverages(traffic)
-    print(f"\n--- Design Coverages (USACE TM 5-822-12) ---")
+    print("\n--- Design Coverages (USACE TM 5-822-12) ---")
     print(f"  Total coverages:  {cov_result.total_coverages:,.2f}")
     print(f"  Design wheel load: {cov_result.design_wheel_load_kn:.1f} kN")
     print(f"  Method:           {cov_result.method}")
     print(f"  Confidence:       {cov_result.confidence}")
 
     subgrade_cbr = 5.0
-    print(f"\n--- Pavement Thickness (USACE CBR Curves) ---")
+    print("\n--- Pavement Thickness (USACE CBR Curves) ---")
     print(f"  Subgrade CBR:     {subgrade_cbr}%")
     try:
         pv_result = design_pavement(traffic, subgrade_cbr=subgrade_cbr)
@@ -82,14 +82,14 @@ def main() -> None:
         print(f"  ERROR: {e}")
         return
 
-    print(f"\n--- Summary ---")
+    print("\n--- Summary ---")
     print(f"  Design life:      {traffic.design_life_years} years")
     print(f"  Working days/yr:  {traffic.working_days_per_year}")
     print(f"  CESA:             {cesa_result.total_cesa:,.0f}")
     print(f"  Coverages:        {cov_result.total_coverages:,.0f}")
     print(f"  Pavement:         {pv_result.required_thickness_mm:.0f} mm @ CBR {subgrade_cbr}%")
 
-    print(f"\nExample 01 completed successfully.")
+    print("\nExample 01 completed successfully.")
 
 
 if __name__ == "__main__":
