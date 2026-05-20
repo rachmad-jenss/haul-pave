@@ -46,3 +46,7 @@ Thumbs.db
 .env
 .env.local
 .env*.local
+
+# AI tool files (not for public repo)
+AGENTS.md
+.opencode/
