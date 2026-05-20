@@ -9,7 +9,7 @@ from haulpave.utils import units
 
 class TestPressure:
     def test_psi_to_kpa_known_value(self) -> None:
-        assert units.psi_to_kpa(100.0) == pytest.approx(689.476)
+        assert units.psi_to_kpa(100.0) == pytest.approx(689.4757293168)
 
     def test_kpa_to_psi_known_value(self) -> None:
         assert units.kpa_to_psi(689.476) == pytest.approx(100.0, rel=1e-4)
@@ -97,7 +97,7 @@ class TestForce:
 
 class TestSpeed:
     def test_mph_to_kmh_known(self) -> None:
-        assert units.mph_to_kmh(60.0) == pytest.approx(96.5604)
+        assert units.mph_to_kmh(60.0) == pytest.approx(96.56064)
 
     def test_kmh_to_mph_known(self) -> None:
         assert units.kmh_to_mph(100.0) == pytest.approx(62.1371, rel=1e-4)
@@ -111,8 +111,8 @@ class TestSpeed:
 
 
 class TestAllExports:
-    def test_all_contains_fourteen_functions(self) -> None:
-        assert len(units.__all__) == 14
+    def test_all_contains_eighteen_functions(self) -> None:
+        assert len(units.__all__) == 18
 
     def test_all_exports_are_callable(self) -> None:
         for name in units.__all__:
