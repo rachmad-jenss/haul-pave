@@ -13,7 +13,7 @@ Confidence label: ``method_implemented``.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 __all__ = [
     "MaterialTemplate",
@@ -51,6 +51,16 @@ class MaterialTemplate(BaseModel):
     )
     typical_modulus_mpa: float = Field(gt=0, description="Typical elastic modulus [MPa]")
     source: str = Field(min_length=1, description="Provenance reference for template data")
+
+    @field_validator("cbr_range")
+    @classmethod
+    def _validate_cbr_range(cls, v: tuple[float, float | None]) -> tuple[float, float | None]:
+        lo, hi = v
+        if lo < 0:
+            raise ValueError(f"CBR lower bound must be >= 0, got {lo}")
+        if hi is not None and hi <= lo:
+            raise ValueError(f"CBR upper bound must be > lower bound, got ({lo}, {hi})")
+        return v
 
 
 # ---------------------------------------------------------------------------
@@ -226,7 +236,7 @@ def find_by_class(g_class: str) -> MaterialTemplate | None:
     MaterialTemplate | None
         The matching template, or ``None`` if not found.
     """
-    for tmpl in MATERIAL_CATALOG:
+    for tmpl in _TRH14_TEMPLATES:
         if tmpl.material_class == g_class:
             return tmpl
     return None
