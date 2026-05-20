@@ -6,6 +6,9 @@ Commands:
   coverages  — Compute design coverages from a traffic JSON file.
   design     — Run USACE CBR pavement design.
   compare    — Run USACE vs TRH 14 comparison.
+  economics  — Compute operating cost from a scenario JSON file.
+  scenario   — Compare operating costs across road surface types.
+  export     — Export scenario comparison to Excel (.xlsx).
 """
 
 from __future__ import annotations
@@ -51,6 +54,10 @@ _InputPath = Annotated[Path, typer.Option("--input", "-i", help="Path to traffic
 _JsonFlag = Annotated[bool, typer.Option("--json", help="Output as JSON")]
 _CbrOption = Annotated[float, typer.Option("--cbr", help="Subgrade CBR [%]")]
 _CurveIdOption = Annotated[str, typer.Option("--curve-id", help="Curve dataset ID")]
+_OutputPath = Annotated[Path, typer.Option("--output", "-o", help="Output file path")]
+_TripsPerDay = Annotated[float, typer.Option("--trips-per-day", help="One-way trips per day")]
+_WorkingDays = Annotated[int, typer.Option("--working-days", help="Working days per year")]
+_FuelPrice = Annotated[float, typer.Option("--fuel-price", help="Fuel price [USD/L]")]
 
 
 @app.command()
@@ -145,6 +152,108 @@ def compare(
         sign = "+" if result.delta_mm >= 0 else ""
         typer.echo(f"Delta (TRH14 − USACE): {sign}{result.delta_mm:.0f} mm")
         typer.echo(f"Subgrade CBR: {result.subgrade_cbr}%")
+
+
+@app.command()
+def economics(
+    input_path: _InputPath,
+    trips_per_day: _TripsPerDay = 0.0,
+    working_days: _WorkingDays = 250,
+    output_json: _JsonFlag = False,
+) -> None:
+    """Compute operating cost from a scenario JSON file."""
+    from haulpave.economics.engine import compute_economics
+    from haulpave.models.economics import CostScenario
+
+    with input_path.open(encoding="utf-8") as f:
+        data: Any = json.load(f)
+    scenario = CostScenario.model_validate(data)
+    result = compute_economics(
+        scenario, trips_per_day=trips_per_day, working_days_per_year=working_days
+    )
+
+    if output_json:
+        _print_json(result)
+    else:
+        typer.echo(f"Scenario:        {result.scenario_id}")
+        typer.echo(f"Cost per trip:   ${result.cost_per_trip:,.2f}")
+        typer.echo(f"Cost per t·km:   ${result.cost_per_tonne_km:.4f}")
+        typer.echo(f"Annual cost:     ${result.annual_cost:,.2f}")
+        typer.echo(f"Trips per year:  {result.trips_per_year:,.0f}")
+        typer.echo(f"Confidence:      {result.confidence}")
+
+
+@app.command()
+def scenario(
+    input_path: _InputPath,
+    fuel_price: _FuelPrice = 0.80,
+    working_days: _WorkingDays = 250,
+    output_json: _JsonFlag = False,
+) -> None:
+    """Compare operating costs across road surface types (asphalt/gravel/concrete)."""
+    from haulpave.economics.compare import RoadScenario, compare_scenarios
+
+    with input_path.open(encoding="utf-8") as f:
+        data: Any = json.load(f)
+    roads = [RoadScenario.model_validate(r) for r in data]
+    result = compare_scenarios(
+        roads,
+        fuel_price_usd_per_litre=fuel_price,
+        working_days_per_year=working_days,
+    )
+
+    if output_json:
+        typer.echo(result.model_dump_json(indent=2))
+    else:
+        typer.echo(
+            f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}"
+            f"  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}"
+        )
+        typer.echo("-" * 72)
+        for sc in result.scenarios:
+            total = (
+                sc.fuel_cost_usd_per_year
+                + sc.tire_cost_usd_per_year
+                + sc.maintenance_cost_usd_per_year
+            )
+            typer.echo(
+                f"{sc.name:>10}  {sc.fuel_cost_usd_per_year:>14,.0f}  "
+                f"{sc.tire_cost_usd_per_year:>14,.0f}  "
+                f"{sc.maintenance_cost_usd_per_year:>14,.0f}  "
+                f"{total:>14,.0f}"
+            )
+        typer.echo(f"\nConfidence: {result.confidence}")
+
+
+@app.command()
+def export(
+    input_path: _InputPath,
+    output_path: _OutputPath,
+    fuel_price: _FuelPrice = 0.80,
+    working_days: _WorkingDays = 250,
+) -> None:
+    """Export scenario comparison to an Excel (.xlsx) workbook."""
+    try:
+        from haulpave.economics.export import export_comparison_to_excel
+    except ImportError:
+        typer.echo(
+            "Error: openpyxl is required for Excel export."
+            "  Install with: pip install haulpave[excel]"
+        )
+        raise typer.Exit(code=1) from None
+
+    from haulpave.economics.compare import RoadScenario, compare_scenarios
+
+    with input_path.open(encoding="utf-8") as f:
+        data: Any = json.load(f)
+    roads = [RoadScenario.model_validate(r) for r in data]
+    comp = compare_scenarios(
+        roads,
+        fuel_price_usd_per_litre=fuel_price,
+        working_days_per_year=working_days,
+    )
+    saved = export_comparison_to_excel(comp, output_path)
+    typer.echo(f"Exported to {saved}")
 
 
 if __name__ == "__main__":
