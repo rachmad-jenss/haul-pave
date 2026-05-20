@@ -84,21 +84,18 @@ def three_surface_scenarios() -> list[RoadScenario]:
         RoadScenario(
             name="Asphalt",
             surface="asphalt",
-            thickness_mm=100,
             haul_distance_km=HAUL_KM,
             trips_per_day=TRIPS_PER_DAY,
         ),
         RoadScenario(
             name="Gravel",
             surface="gravel",
-            thickness_mm=600,
             haul_distance_km=HAUL_KM,
             trips_per_day=TRIPS_PER_DAY,
         ),
         RoadScenario(
             name="Concrete",
             surface="concrete",
-            thickness_mm=200,
             haul_distance_km=HAUL_KM,
             trips_per_day=TRIPS_PER_DAY,
         ),
@@ -230,7 +227,6 @@ class TestOrderingInvariants:
             RoadScenario(
                 name="A",
                 surface="asphalt",
-                thickness_mm=100,
                 haul_distance_km=5.0,
                 trips_per_day=20,
             )
@@ -239,7 +235,6 @@ class TestOrderingInvariants:
             RoadScenario(
                 name="A",
                 surface="asphalt",
-                thickness_mm=100,
                 haul_distance_km=10.0,
                 trips_per_day=20,
             )
