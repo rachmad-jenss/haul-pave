@@ -79,7 +79,8 @@ testpaths = ["tests"]
 
 [tool.coverage.run]
 source = ["haulpave"]
-omit = ["*/haulpave/cli/*"]
+# CLI is now covered by unit tests in tests/test_cli/
+# omit = ["*/haulpave/cli/*"]
 
 [tool.coverage.report]
 exclude_lines = [
