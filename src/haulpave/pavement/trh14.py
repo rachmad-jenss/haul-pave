@@ -154,7 +154,7 @@ def _interpolate_catalog(
             return thickness_values[i] + frac * (thickness_values[i + 1] - thickness_values[i])
 
     # Clamped value equals the upper boundary exactly
-    return float(thickness_values[-1])
+    return float(thickness_values[-1])  # pragma: no cover
 
 
 @dataclass(frozen=True)

@@ -13,7 +13,12 @@ import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
-from haulpave.pavement.trh14 import TRH14Result, cbr_to_material_class, compute_trh14
+from haulpave.pavement.trh14 import (
+    TRH14Result,
+    _interpolate_catalog,
+    cbr_to_material_class,
+    compute_trh14,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -213,6 +218,33 @@ class TestComputeTrh14CoverageClamping:
             result = compute_trh14(traffic_heavy, subgrade_cbr=10.0)
         assert result.total_coverages > 1_000_000  # confirms input is above catalog max
         assert result.total_thickness_mm == pytest.approx(600.0, abs=1e-6)  # G5 @ max knot
+
+
+# ---------------------------------------------------------------------------
+# _interpolate_catalog — error handling and edge cases
+# ---------------------------------------------------------------------------
+class TestInterpolateCatalog:
+    """Direct unit tests for the private _interpolate_catalog function."""
+
+    def test_empty_coverage_levels_raises(self) -> None:
+        """Empty coverage_levels raises ValueError."""
+        with pytest.raises(ValueError, match="must be non-empty"):
+            _interpolate_catalog([150.0], [], 1000.0)
+
+    def test_empty_thickness_values_raises(self) -> None:
+        """Empty thickness_values raises ValueError."""
+        with pytest.raises(ValueError, match="must be non-empty"):
+            _interpolate_catalog([], [100], 1000.0)
+
+    def test_shape_mismatch_raises(self) -> None:
+        """Length mismatch raises ValueError."""
+        with pytest.raises(ValueError, match="Catalog shape mismatch"):
+            _interpolate_catalog([150.0, 300.0], [100, 1000, 10000], 1000.0)
+
+    def test_shape_mismatch_with_single_value(self) -> None:
+        """Single thickness value with multi-element coverage also raises."""
+        with pytest.raises(ValueError, match="Catalog shape mismatch"):
+            _interpolate_catalog([150.0], [100, 1000, 10000], 1000.0)
 
 
 # ---------------------------------------------------------------------------

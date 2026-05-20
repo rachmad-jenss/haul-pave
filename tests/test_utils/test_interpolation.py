@@ -46,6 +46,26 @@ class TestValidateCurveData:
         with pytest.raises(ValueError, match="missing coverage level key"):
             _validate_curve_data(bad_data)
 
+    def test_single_cbr_raises(self) -> None:
+        """Only one CBR value raises ValueError."""
+        bad_data: dict = {
+            "cbr_values": [10],
+            "coverage_levels": [100, 1000],
+            "thickness_mm": {"100": [600], "1000": [700]},
+        }
+        with pytest.raises(ValueError, match="cbr_values must have at least 2 points"):
+            _validate_curve_data(bad_data)
+
+    def test_single_coverage_level_raises(self) -> None:
+        """Only one coverage level raises ValueError."""
+        bad_data: dict = {
+            "cbr_values": [5, 10, 100],
+            "coverage_levels": [1000],
+            "thickness_mm": {"1000": [600, 400, 150]},
+        }
+        with pytest.raises(ValueError, match="coverage_levels must have at least 2 points"):
+            _validate_curve_data(bad_data)
+
 
 class TestLoadCurveData:
     def test_returns_dict_with_expected_keys(self, curve_data: dict) -> None:  # type: ignore[type-arg]
