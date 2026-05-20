@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from haulpave.material_library import (
     MATERIAL_CATALOG,
@@ -30,7 +31,7 @@ class TestListAll:
 
     def test_immutable(self) -> None:
         t = list_all()[0]
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             t.name = "changed"  # type: ignore[misc]
 
 
@@ -59,6 +60,7 @@ class TestFindByCbr:
         results = find_by_cbr(80.0)
         g_classes = {r.material_class for r in results}
         assert "G1" in g_classes
+        assert "G2" not in g_classes
 
     def test_g5_range_cbr_10(self) -> None:
         results = find_by_cbr(10.0)
@@ -106,11 +108,16 @@ class TestFindByCbr:
         for r in results:
             assert isinstance(r, MaterialTemplate)
 
-    def test_cbr_near_upper_bound(self) -> None:
-        results = find_by_cbr(79.0)
+    def test_cbr_above_100_g1_only(self) -> None:
+        results = find_by_cbr(150.0)
         g_classes = {r.material_class for r in results}
-        assert "G2" in g_classes
-        assert "G1" not in g_classes
+        assert g_classes == {"G1"}
+
+    def test_cbr_100_excludes_usace_boundary(self) -> None:
+        results = find_by_cbr(100.0)
+        g_classes = {r.material_class for r in results}
+        assert "G1" in g_classes
+        assert "N/A" not in g_classes
 
 
 class TestMaterialCatalog:
@@ -133,3 +140,25 @@ class TestMaterialCatalog:
     def test_all_have_positive_modulus(self) -> None:
         for t in MATERIAL_CATALOG:
             assert t.typical_modulus_mpa > 0
+
+
+class TestMaterialTemplateValidation:
+    def test_negative_cbr_lower_bound_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            MaterialTemplate(
+                name="Bad",
+                material_class="G1",
+                cbr_range=(-1.0, 10.0),
+                typical_modulus_mpa=100.0,
+                source="Test source",
+            )
+
+    def test_upper_bound_not_greater_than_lower_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            MaterialTemplate(
+                name="Bad",
+                material_class="G1",
+                cbr_range=(10.0, 5.0),
+                typical_modulus_mpa=100.0,
+                source="Test source",
+            )
