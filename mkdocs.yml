@@ -26,6 +26,15 @@ theme:
 
 nav:
   - Home: index.md
+  - API Reference:
+    - Traffic: api/traffic.md
+    - Pavement: api/pavement.md
+    - Economics: api/economics.md
+    - Models: api/models.md
+    - Reporting: api/reporting.md
+    - Vehicle Registry: api/vehicle_registry.md
+    - Utilities: api/utils.md
+    - CLI: api/cli.md
 
 markdown_extensions:
   - admonition
