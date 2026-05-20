@@ -51,7 +51,6 @@ class RoadScenario(BaseModel):
 
     name: str = Field(min_length=1)
     surface: Literal["asphalt", "gravel", "concrete"]
-    thickness_mm: float = Field(ge=0, description="Pavement design thickness [mm]")
     haul_distance_km: float = Field(gt=0, description="One-way haul distance [km]")
     trips_per_day: float = Field(gt=0, description="One-way vehicle trips per day")
 

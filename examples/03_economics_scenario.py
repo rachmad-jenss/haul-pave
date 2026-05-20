@@ -56,21 +56,18 @@ def main() -> None:
         RoadScenario(
             name="Asphalt",
             surface="asphalt",
-            thickness_mm=450.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
         RoadScenario(
             name="Gravel",
             surface="gravel",
-            thickness_mm=500.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
         RoadScenario(
             name="Concrete",
             surface="concrete",
-            thickness_mm=400.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
@@ -83,7 +80,8 @@ def main() -> None:
     )
 
     print(
-        f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}"
+        f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}"
+        f"  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}"
     )
     print(f"{'-' * 10}  {'-' * 14}  {'-' * 14}  {'-' * 14}  {'-' * 14}")
 
