@@ -24,11 +24,13 @@ References
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from haulpave.models.traffic import TrafficInput
-from haulpave.pavement import PavementResult, design_pavement
 from haulpave.pavement.trh14 import TRH14Result, compute_trh14
+
+if TYPE_CHECKING:
+    from haulpave.pavement import PavementResult
 
 __all__ = ["ComparisonResult", "compare_methods"]
 
@@ -103,6 +105,8 @@ def compare_methods(
         Propagated from either sub-engine — e.g. CBR out of USACE curve
         range, or G8/G9 subgrade (CBR < 2%) not in TRH 14 catalog.
     """
+    from haulpave.pavement import design_pavement
+
     usace_result = design_pavement(traffic, subgrade_cbr, curve_id)
     trh14_result = compute_trh14(traffic, subgrade_cbr)
     delta = trh14_result.total_thickness_mm - usace_result.required_thickness_mm

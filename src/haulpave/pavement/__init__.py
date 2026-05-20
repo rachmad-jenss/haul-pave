@@ -19,7 +19,10 @@ References
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from haulpave.pavement.trh14 import TRH14Result
 
 from haulpave.models.traffic import TrafficInput
 from haulpave.traffic.cesa import compute_cesa
@@ -214,8 +217,14 @@ def trh14_thickness_from_coverages(
     )
 
 
-# Type alias kept at module level to avoid circular import in annotations above
-# Bottom import — avoids circular dependency: compare.py imports PavementResult
-# and design_pavement from this module (already defined above by this point).
-from haulpave.pavement.compare import ComparisonResult, compare_methods  # noqa: E402
-from haulpave.pavement.trh14 import TRH14Result  # noqa: E402
+
+def __getattr__(name: str) -> Any:
+    """Lazy re-export to break circular import between this module and compare."""
+    if name in ("ComparisonResult", "compare_methods"):
+        import haulpave.pavement.compare as _mod
+        return getattr(_mod, name)
+    if name == "TRH14Result":
+        from haulpave.pavement.trh14 import TRH14Result
+        return TRH14Result
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)
