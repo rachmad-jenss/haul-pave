@@ -36,23 +36,18 @@ def main() -> None:
         working_days_per_year=350,
     )
 
+    print(f"\nFleet: {traffic.fleet[0].vehicle.name} @ {traffic.fleet[0].trips_per_day} trips/day")
     print(
-        f"\nFleet: {traffic.fleet[0].vehicle.name}"
-        f" @ {traffic.fleet[0].trips_per_day} trips/day"
-    )
-    print(
-        f"Design life: {traffic.design_life_years} years,"
-        f" {traffic.working_days_per_year} days/yr"
+        f"Design life: {traffic.design_life_years} years, {traffic.working_days_per_year} days/yr"
     )
     print()
 
     cbr_values = [3.0, 5.0, 10.0]
 
     print(
-        f"{'CBR':>5}  {'USACE (mm)':>12}  {'TRH 14 (mm)':>12}"
-        f"  {'Delta (mm)':>12}  {'G-Class':>8}"
+        f"{'CBR':>5}  {'USACE (mm)':>12}  {'TRH 14 (mm)':>12}  {'Delta (mm)':>12}  {'G-Class':>8}"
     )
-    print(f"{'-'*5}  {'-'*12}  {'-'*12}  {'-'*12}  {'-'*8}")
+    print(f"{'-' * 5}  {'-' * 12}  {'-' * 12}  {'-' * 12}  {'-' * 8}")
 
     for cbr in cbr_values:
         try:

@@ -60,12 +60,8 @@ class TestCompareScenarios:
 
     def test_concrete_cheapest(self) -> None:
         scenarios = [
-            RoadScenario(
-                name="A", surface="asphalt", haul_distance_km=10, trips_per_day=10
-            ),
-            RoadScenario(
-                name="G", surface="gravel", haul_distance_km=10, trips_per_day=10
-            ),
+            RoadScenario(name="A", surface="asphalt", haul_distance_km=10, trips_per_day=10),
+            RoadScenario(name="G", surface="gravel", haul_distance_km=10, trips_per_day=10),
             RoadScenario(
                 name="C",
                 surface="concrete",
