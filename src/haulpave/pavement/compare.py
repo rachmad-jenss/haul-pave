@@ -9,7 +9,7 @@ Pipeline
 2. TRH 14 path (``compute_trh14``) — USACE coverages + TRH 14 catalog.
 3. delta_mm = TRH 14 thickness − USACE thickness.
 
-Confidence label: ``benchmark_tested`` — both sub-engines are benchmark_tested;
+Confidence label: ``high`` — both sub-engines are ``high`` confidence;
 comparison arithmetic is verified in tests against known sub-results.
 
 References
@@ -58,8 +58,7 @@ class ComparisonResult:
     method:
         Human-readable method identifier.
     confidence:
-        Confidence label.  Inherits from sub-engines: both are
-        ``benchmark_tested``.
+        Confidence label.  Inherits from sub-engines: both are ``high``.
     """
 
     usace: PavementResult
@@ -68,8 +67,8 @@ class ComparisonResult:
     subgrade_cbr: float
     curve_id: str
     method: str = "USACE TM 5-822-12 CBR vs TRH 14 (CSRA 1985) comparison"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "benchmark_tested"
+    confidence: Literal["high", "medium", "low"] = (
+        "high"
     )
 
 

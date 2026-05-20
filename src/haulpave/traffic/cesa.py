@@ -24,7 +24,7 @@ CESA per vehicle per direction
 
 Total CESA = sum over all FleetUnits.
 
-Confidence label: ``benchmark_tested`` — matches published hand-calc within ±1 %.
+Confidence label: ``high`` — matches published hand-calc within ±1 %.
 """
 
 from __future__ import annotations
@@ -57,8 +57,8 @@ class CesaResult:
 
     total_cesa: float
     method: str = "AASHTO 4th-power LEF (AASHTO 1993)"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "benchmark_tested"
+    confidence: Literal["high", "medium", "low"] = (
+        "high"
     )
 
 

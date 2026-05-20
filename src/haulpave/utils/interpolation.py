@@ -59,7 +59,7 @@ def interpolate_thickness(
     curve_data: dict[str, Any],
     cbr: float,
     coverages: float,
-) -> float:
+) -> tuple[float, bool]:
     """Interpolate required pavement thickness for given CBR and design coverages.
 
     Uses 2-step PCHIP interpolation:
@@ -76,7 +76,8 @@ def interpolate_thickness(
             the curve's coverage range are clamped to the boundary.
 
     Returns:
-        Required total pavement thickness [mm].
+        Tuple of (required total pavement thickness [mm], was_clamped).
+        ``was_clamped`` is True when coverages were outside the curve range.
 
     Raises:
         ValueError: If CBR is outside the supported range, coverages <= 0,
@@ -92,7 +93,7 @@ def interpolate_thickness(
     if coverages <= 0:
         raise ValueError(f"coverages must be > 0, got {coverages}")
 
-    # Clamp coverages to range with warning
+    was_clamped = False
     if coverages < coverage_levels[0]:
         warnings.warn(
             f"USACE CBR: design coverages ({coverages:.0f}) below curve minimum "
@@ -100,6 +101,7 @@ def interpolate_thickness(
             UserWarning,
             stacklevel=2,
         )
+        was_clamped = True
     elif coverages > coverage_levels[-1]:
         warnings.warn(
             f"USACE CBR: design coverages ({coverages:.0f}) exceed curve maximum "
@@ -107,6 +109,7 @@ def interpolate_thickness(
             UserWarning,
             stacklevel=2,
         )
+        was_clamped = True
     log_cov = np.log10(np.clip(coverages, coverage_levels[0], coverage_levels[-1]))
     log_cov_levels = np.log10(coverage_levels)
 
@@ -119,4 +122,4 @@ def interpolate_thickness(
 
     # Interpolate across coverage levels (log scale)
     cov_pchip = PchipInterpolator(log_cov_levels, thicknesses_at_coverages)
-    return float(cov_pchip(log_cov))
+    return float(cov_pchip(log_cov)), was_clamped

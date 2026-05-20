@@ -5,7 +5,7 @@ interpolation from digitized curve data.  Orchestrates the CESA engine
 (AASHTO 4th-power law) and the design-coverages engine (USACE pass-count
 method) then maps the result onto the CBR thickness curve.
 
-Confidence label: ``benchmark_tested`` — passes bench_03 and bench_04.
+Confidence label: ``high`` — passes bench_03 and bench_04.
 
 References
 ----------
@@ -18,6 +18,7 @@ References
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -51,8 +52,18 @@ class PavementResult:
         Total equivalent design-wheel coverages over the full design life.
     required_thickness_mm:
         Required total pavement thickness from the CBR design curve [mm].
+    total_thickness_mm:
+        Alias for ``required_thickness_mm``.  Total pavement thickness [mm].
     design_wheel_load_kn:
         Maximum single-wheel load in the fleet [kN] — the design vehicle.
+    subgrade_cbr:
+        Subgrade CBR value [%] used for the design.
+    layers:
+        Layer breakdown (empty for USACE CBR method; populated when
+        layer-specific design methods are used).
+    was_clamped:
+        True if design coverages exceeded the curve range and were clamped
+        to the nearest boundary.
     method:
         Human-readable method identifier.
     confidence:
@@ -63,10 +74,12 @@ class PavementResult:
     total_coverages: float
     required_thickness_mm: float
     design_wheel_load_kn: float
+    total_thickness_mm: float = 0.0
+    subgrade_cbr: float = 0.0
+    layers: tuple[dict[str, Any], ...] = ()
+    was_clamped: bool = False
     method: str = "USACE TM 5-822-12 CBR design curves + AASHTO 4th-power LEF"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "benchmark_tested"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def design_pavement(
@@ -101,24 +114,29 @@ def design_pavement(
 
     Notes
     -----
-    Coverage values that exceed the curve's tabulated range are silently
-    clamped to the curve boundary by ``interpolate_thickness``.  This is the
-    correct engineering interpretation: the design is governed by the worst
-    case represented in the source chart.
+    Coverage values that exceed the curve's tabulated range are
+    clamped to the curve boundary.  ``result.was_clamped`` is ``True``
+    when clamping occurs.
     """
     cesa_result = compute_cesa(traffic)
     cov_result = compute_coverages(traffic)
     curve_data = load_curve_data(curve_id)
-    thickness = interpolate_thickness(
-        curve_data,
-        cbr=subgrade_cbr,
-        coverages=cov_result.total_coverages,
-    )
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        thickness, _was_clamped = interpolate_thickness(
+            curve_data,
+            cbr=subgrade_cbr,
+            coverages=cov_result.total_coverages,
+        )
+    was_clamped = _was_clamped or any("clamped" in str(msg.message).lower() for msg in w)
     return PavementResult(
         total_cesa=cesa_result.total_cesa,
         total_coverages=cov_result.total_coverages,
         required_thickness_mm=thickness,
+        total_thickness_mm=thickness,
         design_wheel_load_kn=cov_result.design_wheel_load_kn,
+        subgrade_cbr=subgrade_cbr,
+        was_clamped=was_clamped,
     )
 
 
@@ -155,7 +173,8 @@ def cbr_thickness_from_coverages(
         Required total pavement thickness [mm].
     """
     curve_data = load_curve_data(curve_id)
-    return interpolate_thickness(curve_data, cbr=subgrade_cbr, coverages=design_coverages)
+    thickness, _was_clamped = interpolate_thickness(curve_data, cbr=subgrade_cbr, coverages=design_coverages)
+    return thickness
 
 
 def trh14_thickness_from_coverages(
@@ -187,16 +206,16 @@ def trh14_thickness_from_coverages(
     """
     from haulpave.pavement.trh14 import (
         TRH14Result,
-        _interpolate_catalog,
-        _load_catalog,
+        interpolate_catalog,
         cbr_to_material_class,
+        load_catalog,
     )
 
     if design_coverages <= 0:
         raise ValueError(f"design_coverages must be > 0, got {design_coverages}")
 
     g_class = cbr_to_material_class(subgrade_cbr)
-    catalog = _load_catalog()
+    catalog = load_catalog()
     thickness_table: dict[str, list[float]] = catalog["thickness_mm"]
 
     if g_class not in thickness_table:
@@ -207,13 +226,14 @@ def trh14_thickness_from_coverages(
 
     coverage_levels: list[int] = catalog["coverage_levels"]
     thickness_values: list[float] = thickness_table[g_class]
-    thickness = _interpolate_catalog(thickness_values, coverage_levels, design_coverages)
+    thickness, was_clamped = interpolate_catalog(thickness_values, coverage_levels, design_coverages)
 
     return TRH14Result(
         material_class=g_class,
         total_thickness_mm=thickness,
         total_coverages=design_coverages,
         design_wheel_load_kn=0.0,  # unknown when using pre-computed coverages
+        was_clamped=was_clamped,
     )
 
 

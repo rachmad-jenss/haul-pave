@@ -117,7 +117,7 @@ def test_cbr_thickness_interpolation(case_id: str, cbr: float, coverages: float)
     the hardcoded expected values in bench_03_expected.json.
     """
     expected = _CASES[case_id]["expected_thickness_mm"]
-    computed = interpolate_thickness(_CURVE_DATA, cbr, coverages)
+    computed, _was_clamped = interpolate_thickness(_CURVE_DATA, cbr, coverages)
     _assert_close(computed, expected, f"{case_id} (CBR={cbr}, cov={coverages})")
 
 
@@ -130,8 +130,8 @@ class TestCBRThicknessMonotonicity:
 
     def test_thickness_increases_with_coverages(self) -> None:
         """At constant CBR, more coverages must require more thickness."""
-        t_low = interpolate_thickness(_CURVE_DATA, cbr=5, coverages=100)
-        t_high = interpolate_thickness(_CURVE_DATA, cbr=5, coverages=10000)
+        t_low, _ = interpolate_thickness(_CURVE_DATA, cbr=5, coverages=100)
+        t_high, _ = interpolate_thickness(_CURVE_DATA, cbr=5, coverages=10000)
         assert t_high > t_low, (
             f"Expected more thickness at higher coverages: "
             f"cov=100 → {t_low:.1f} mm, cov=10000 → {t_high:.1f} mm"
@@ -139,8 +139,8 @@ class TestCBRThicknessMonotonicity:
 
     def test_thickness_decreases_with_cbr(self) -> None:
         """At constant coverages, stronger subgrade (higher CBR) requires less thickness."""
-        t_weak = interpolate_thickness(_CURVE_DATA, cbr=3, coverages=1000)
-        t_strong = interpolate_thickness(_CURVE_DATA, cbr=15, coverages=1000)
+        t_weak, _ = interpolate_thickness(_CURVE_DATA, cbr=3, coverages=1000)
+        t_strong, _ = interpolate_thickness(_CURVE_DATA, cbr=15, coverages=1000)
         assert t_strong < t_weak, (
             f"Expected less thickness for stronger subgrade: "
             f"CBR=3 → {t_weak:.1f} mm, CBR=15 → {t_strong:.1f} mm"
@@ -148,8 +148,8 @@ class TestCBRThicknessMonotonicity:
 
     def test_case_a_thicker_than_case_c(self) -> None:
         """Case A (soft subgrade, moderate traffic) must exceed Case C (firm, high traffic)."""
-        t_a = interpolate_thickness(_CURVE_DATA, cbr=3, coverages=1000)
-        t_c = interpolate_thickness(_CURVE_DATA, cbr=15, coverages=50000)
+        t_a, _ = interpolate_thickness(_CURVE_DATA, cbr=3, coverages=1000)
+        t_c, _ = interpolate_thickness(_CURVE_DATA, cbr=15, coverages=50000)
         assert t_a > t_c, (
             f"Case A (CBR=3, cov=1000) thickness {t_a:.1f} mm should exceed "
             f"Case C (CBR=15, cov=50000) {t_c:.1f} mm"

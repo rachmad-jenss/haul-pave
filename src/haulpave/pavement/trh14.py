@@ -9,7 +9,7 @@ on the design-coverages axis.
 Design traffic is computed via the USACE TM 5-822-12 design-coverages method
 (same ``compute_coverages`` engine used by the USACE CBR path).
 
-Confidence label: ``benchmark_tested`` — passes bench_05.
+Confidence label: ``high`` — passes bench_05.
 
 References
 ----------
@@ -35,13 +35,21 @@ from typing import Any, Literal
 from haulpave.models.traffic import TrafficInput
 from haulpave.traffic.coverages import compute_coverages
 
-__all__ = ["TRH14Result", "cbr_to_material_class", "compute_trh14"]
+__all__ = [
+    "TRH14Result",
+    "cbr_to_material_class",
+    "compute_trh14",
+    "CATALOG_PATH",
+    "G_CLASS_BOUNDS",
+    "interpolate_catalog",
+    "load_catalog",
+]
 
-_CATALOG_PATH = Path(__file__).parent.parent / "design" / "curves" / "trh14_catalog_v1.json"
+CATALOG_PATH = Path(__file__).parent.parent / "design" / "curves" / "trh14_catalog_v1.json"
 
 # G-class lower-CBR boundaries in descending order (strongest first).
 # Boundary is inclusive on the lower end: CBR=7 → G5 (not G6).
-_G_CLASS_BOUNDS: list[tuple[str, float]] = [
+G_CLASS_BOUNDS: list[tuple[str, float]] = [
     ("G1", 80.0),
     ("G2", 45.0),
     ("G3", 25.0),
@@ -79,27 +87,27 @@ def cbr_to_material_class(cbr: float) -> str:
     """
     if cbr < 0:
         raise ValueError(f"CBR must be >= 0, got {cbr}")
-    for g_class, min_cbr in _G_CLASS_BOUNDS:
+    for g_class, min_cbr in G_CLASS_BOUNDS:
         if cbr >= min_cbr:
             return g_class
     return "G9"  # pragma: no cover — G9 bound=0.0 catches all remaining values
 
 
 @lru_cache(maxsize=1)
-def _load_catalog() -> dict[str, Any]:
+def load_catalog() -> dict[str, Any]:
     """Load TRH 14 design catalog JSON (cached per process)."""
-    with _CATALOG_PATH.open(encoding="utf-8") as fh:
+    with CATALOG_PATH.open(encoding="utf-8") as fh:
         return json.load(fh)  # type: ignore[no-any-return]
 
 
-def _interpolate_catalog(
+def interpolate_catalog(
     thickness_values: list[float],
     coverage_levels: list[int],
     coverages: float,
-) -> float:
+) -> tuple[float, bool]:
     """Log-linear interpolation of thickness at a given coverage level.
 
-    Coverage values outside the catalog range are silently clamped to the
+    Coverage values outside the catalog range are clamped to the
     nearest boundary — consistent with the USACE interpolation convention.
 
     Parameters
@@ -113,8 +121,8 @@ def _interpolate_catalog(
 
     Returns
     -------
-    float
-        Interpolated total pavement thickness [mm].
+    tuple[float, bool]
+        Interpolated total pavement thickness [mm] and whether clamping occurred.
 
     Raises
     ------
@@ -128,6 +136,7 @@ def _interpolate_catalog(
             "Catalog shape mismatch: len(thickness_values) must equal len(coverage_levels)"
         )
 
+    was_clamped = False
     if coverages < coverage_levels[0]:
         warnings.warn(
             f"TRH 14: design coverages ({coverages:.0f}) below catalog minimum "
@@ -135,6 +144,7 @@ def _interpolate_catalog(
             UserWarning,
             stacklevel=2,
         )
+        was_clamped = True
     elif coverages > coverage_levels[-1]:
         warnings.warn(
             f"TRH 14: design coverages ({coverages:.0f}) exceed catalog maximum "
@@ -142,6 +152,7 @@ def _interpolate_catalog(
             UserWarning,
             stacklevel=2,
         )
+        was_clamped = True
     cov_clamped = max(float(coverage_levels[0]), min(float(coverage_levels[-1]), coverages))
     log_cov = math.log10(cov_clamped)
     log_levels = [math.log10(float(c)) for c in coverage_levels]
@@ -151,10 +162,10 @@ def _interpolate_catalog(
         if log_levels[i] <= log_cov <= log_levels[i + 1]:
             span = log_levels[i + 1] - log_levels[i]
             frac = (log_cov - log_levels[i]) / span if span > 0 else 0.0
-            return thickness_values[i] + frac * (thickness_values[i + 1] - thickness_values[i])
+            return thickness_values[i] + frac * (thickness_values[i + 1] - thickness_values[i]), was_clamped
 
     # Clamped value equals the upper boundary exactly
-    return float(thickness_values[-1])  # pragma: no cover
+    return float(thickness_values[-1]), was_clamped  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -172,6 +183,9 @@ class TRH14Result:
         (USACE TM 5-822-12 method).
     design_wheel_load_kn:
         Maximum single-wheel load in the fleet [kN] — the design vehicle.
+    was_clamped:
+        True if design coverages exceeded the catalog range and were clamped
+        to the nearest boundary.
     method:
         Human-readable method identifier.
     confidence:
@@ -182,9 +196,10 @@ class TRH14Result:
     total_thickness_mm: float
     total_coverages: float
     design_wheel_load_kn: float
+    was_clamped: bool = False
     method: str = "TRH 14 (CSRA 1985) design catalog + USACE design-coverages"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "benchmark_tested"
+    confidence: Literal["high", "medium", "low"] = (
+        "high"
     )
 
 
@@ -218,7 +233,7 @@ def compute_trh14(traffic: TrafficInput, subgrade_cbr: float) -> TRH14Result:
     cov_result = compute_coverages(traffic)
     g_class = cbr_to_material_class(subgrade_cbr)
 
-    catalog = _load_catalog()
+    catalog = load_catalog()
     thickness_table: dict[str, list[float]] = catalog["thickness_mm"]
 
     if g_class not in thickness_table:
@@ -231,11 +246,14 @@ def compute_trh14(traffic: TrafficInput, subgrade_cbr: float) -> TRH14Result:
     coverage_levels: list[int] = catalog["coverage_levels"]
     thickness_values: list[float] = thickness_table[g_class]
 
-    thickness = _interpolate_catalog(thickness_values, coverage_levels, cov_result.total_coverages)
+    thickness, was_clamped = interpolate_catalog(
+        thickness_values, coverage_levels, cov_result.total_coverages
+    )
 
     return TRH14Result(
         material_class=g_class,
         total_thickness_mm=thickness,
         total_coverages=cov_result.total_coverages,
         design_wheel_load_kn=cov_result.design_wheel_load_kn,
+        was_clamped=was_clamped,
     )

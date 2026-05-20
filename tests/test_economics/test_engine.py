@@ -76,9 +76,9 @@ class TestComputeEconomics:
         result = compute_economics(scenario)
         assert result.scenario_id == "test-01"
 
-    def test_confidence_is_method_implemented(self, scenario: CostScenario) -> None:
+    def test_confidence_is_medium(self, scenario: CostScenario) -> None:
         result = compute_economics(scenario)
-        assert result.confidence == "method_implemented"
+        assert result.confidence == "medium"
 
     def test_result_is_frozen(self, scenario: CostScenario) -> None:
         result = compute_economics(scenario)

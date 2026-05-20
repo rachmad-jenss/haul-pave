@@ -96,14 +96,14 @@ class TestPavementResult:
         assert "AASHTO" in result.method
 
     def test_result_default_confidence(self) -> None:
-        """Default confidence must be 'benchmark_tested'."""
+        """Default confidence must be 'high'."""
         result = PavementResult(
             total_cesa=1.0,
             total_coverages=1.0,
             required_thickness_mm=300.0,
             design_wheel_load_kn=80.0,
         )
-        assert result.confidence == "benchmark_tested"
+        assert result.confidence == "high"
 
     def test_result_fields_accessible(self) -> None:
         """All fields are directly accessible on the result."""

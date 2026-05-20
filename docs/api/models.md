@@ -148,7 +148,7 @@ class DesignResult(BaseModel, frozen=True):
     pavement_structure: PavementStructure
     subgrade: SubgradeInfo
     design_coverages: float
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"]
+    confidence: Literal["high", "medium", "low"]
     method_id: str          # e.g. "USACE-TM5-822-12"
     package_version: str    # haul pave package version
     curve_version: str | None

@@ -13,7 +13,7 @@ Where:
 
     trip_time_hours = haul_distance_km / average_speed_kmh
 
-Confidence label: ``method_implemented`` — straightforward arithmetic,
+Confidence label: ``medium`` — straightforward arithmetic,
 not yet validated against a published benchmark dossier.
 """
 
@@ -68,8 +68,8 @@ class EconomicsResult:
     annual_cost: float
     currency: str
     method: str = "haulpave-economics-v1"
-    confidence: Literal["benchmark_tested", "method_implemented", "experimental"] = (
-        "method_implemented"
+    confidence: Literal["high", "medium", "low"] = (
+        "medium"
     )
 
 

@@ -18,7 +18,7 @@ Where RR is expressed as a fraction (e.g. 0.015 for 1.5 %).
 
 Annual cost = cost_per_km × haul_distance_km × trips_per_day × working_days_per_year
 
-Confidence label: ``experimental`` — linear RR coefficients are calibrated
+Confidence label: ``low`` — linear RR coefficients are calibrated
 industry approximations; not validated against a published benchmark dossier.
 Model validates directionally: gravel > asphalt > concrete in all categories.
 """
@@ -29,7 +29,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ConfidenceLabel = Literal["benchmark_tested", "method_implemented", "experimental"]
+ConfidenceLabel = Literal["high", "medium", "low"]
 
 __all__ = ["ComparisonResult", "RoadScenario", "ScenarioComparison", "compare_scenarios"]
 
@@ -65,7 +65,7 @@ class ScenarioComparison(BaseModel):
     tire_cost_usd_per_year: float = Field(ge=0)
     fuel_cost_usd_per_year: float = Field(ge=0)
     maintenance_cost_usd_per_year: float = Field(ge=0)
-    confidence: ConfidenceLabel = "experimental"
+    confidence: ConfidenceLabel = "low"
 
 
 class ComparisonResult(BaseModel):
@@ -75,7 +75,7 @@ class ComparisonResult(BaseModel):
 
     scenarios: list[ScenarioComparison]
     method: str = "haulpave-economics-rr-v1"
-    confidence: ConfidenceLabel = "experimental"
+    confidence: ConfidenceLabel = "low"
 
 
 def compare_scenarios(
