@@ -22,21 +22,18 @@ def comparison_result() -> ComparisonResult:
         RoadScenario(
             name="Asphalt",
             surface="asphalt",
-            thickness_mm=100,
             haul_distance_km=5.0,
             trips_per_day=20,
         ),
         RoadScenario(
             name="Gravel",
             surface="gravel",
-            thickness_mm=600,
             haul_distance_km=5.0,
             trips_per_day=20,
         ),
         RoadScenario(
             name="Concrete",
             surface="concrete",
-            thickness_mm=200,
             haul_distance_km=5.0,
             trips_per_day=20,
         ),

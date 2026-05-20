@@ -56,21 +56,18 @@ def main() -> None:
         RoadScenario(
             name="Asphalt",
             surface="asphalt",
-            thickness_mm=450.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
         RoadScenario(
             name="Gravel",
             surface="gravel",
-            thickness_mm=500.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
         RoadScenario(
             name="Concrete",
             surface="concrete",
-            thickness_mm=400.0,
             haul_distance_km=5.0,
             trips_per_day=40.0,
         ),
