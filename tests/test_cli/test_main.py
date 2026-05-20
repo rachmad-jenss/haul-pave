@@ -166,3 +166,128 @@ class TestCliHelp:
         output = _strip_ansi(result.output)
         assert "--cbr" in output
         assert "--input" in output
+
+
+_SCENARIO_DATA = {
+    "scenario_id": "test_haul",
+    "haul_distance_km": 5.0,
+    "average_speed_kmh": 35.0,
+    "payload_t": 150.0,
+    "fuel_consumption_l_per_km": 2.5,
+    "assumptions": {
+        "fuel_cost_per_litre": 0.80,
+        "tyre_cost_per_hour": 45.0,
+        "maintenance_cost_per_km": 0.35,
+        "operator_cost_per_hour": 38.0,
+        "currency": "USD",
+    },
+}
+
+_ROADS_DATA = [
+    {
+        "name": "Gravel",
+        "surface": "gravel",
+        "thickness_mm": 500.0,
+        "haul_distance_km": 5.0,
+        "trips_per_day": 40.0,
+    },
+    {
+        "name": "Asphalt",
+        "surface": "asphalt",
+        "thickness_mm": 450.0,
+        "haul_distance_km": 5.0,
+        "trips_per_day": 40.0,
+    },
+]
+
+
+@pytest.fixture()
+def scenario_json(tmp_path: Path) -> Path:
+    p = tmp_path / "scenario.json"
+    p.write_text(json.dumps(_SCENARIO_DATA))
+    return p
+
+
+@pytest.fixture()
+def roads_json(tmp_path: Path) -> Path:
+    p = tmp_path / "roads.json"
+    p.write_text(json.dumps(_ROADS_DATA))
+    return p
+
+
+class TestEconomics:
+    def test_economics_text(self, scenario_json: Path) -> None:
+        result = runner.invoke(
+            app, ["economics", "-i", str(scenario_json), "--trips-per-day", "40"]
+        )
+        assert result.exit_code == 0
+        assert "Cost per trip" in result.output
+        assert "Annual cost" in result.output
+
+    def test_economics_json(self, scenario_json: Path) -> None:
+        result = runner.invoke(
+            app,
+            ["economics", "-i", str(scenario_json), "--trips-per-day", "40", "--json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "cost_per_trip" in data
+        assert data["cost_per_trip"] > 0
+
+    def test_economics_zero_trips(self, scenario_json: Path) -> None:
+        result = runner.invoke(app, ["economics", "-i", str(scenario_json)])
+        assert result.exit_code == 0
+        assert "Annual cost" in result.output
+
+    def test_economics_missing_file(self) -> None:
+        result = runner.invoke(app, ["economics", "-i", "nonexistent.json"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, FileNotFoundError)
+
+
+class TestScenario:
+    def test_scenario_text(self, roads_json: Path) -> None:
+        result = runner.invoke(app, ["scenario", "-i", str(roads_json)])
+        assert result.exit_code == 0
+        assert "Gravel" in result.output
+        assert "Asphalt" in result.output
+
+    def test_scenario_json(self, roads_json: Path) -> None:
+        result = runner.invoke(app, ["scenario", "-i", str(roads_json), "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "scenarios" in data
+        assert len(data["scenarios"]) == 2
+
+    def test_scenario_fuel_price(self, roads_json: Path) -> None:
+        result = runner.invoke(
+            app, ["scenario", "-i", str(roads_json), "--fuel-price", "1.50", "--json"]
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        for s in data["scenarios"]:
+            assert s["fuel_cost_usd_per_year"] > s["maintenance_cost_usd_per_year"]
+
+    def test_scenario_invalid_json(self, tmp_path: Path) -> None:
+        bad = tmp_path / "bad.json"
+        bad.write_text("not json")
+        result = runner.invoke(app, ["scenario", "-i", str(bad)])
+        assert result.exit_code == 1
+
+
+class TestExport:
+    def test_export_creates_file(self, roads_json: Path, tmp_path: Path) -> None:
+        out = tmp_path / "results.xlsx"
+        result = runner.invoke(
+            app, ["export", "-i", str(roads_json), "-o", str(out)]
+        )
+        assert result.exit_code == 0
+        assert out.exists()
+        assert "Exported" in result.output
+
+    def test_export_missing_input(self, tmp_path: Path) -> None:
+        out = tmp_path / "r.xlsx"
+        result = runner.invoke(
+            app, ["export", "-i", "nope.json", "-o", str(out)]
+        )
+        assert result.exit_code == 1
