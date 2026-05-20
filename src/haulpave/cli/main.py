@@ -173,9 +173,7 @@ def economics(
     )
 
     if output_json:
-        from dataclasses import asdict
-
-        typer.echo(json.dumps(asdict(result), indent=2))
+        _print_json(result)
     else:
         typer.echo(f"Scenario:        {result.scenario_id}")
         typer.echo(f"Cost per trip:   ${result.cost_per_trip:,.2f}")
@@ -193,7 +191,7 @@ def scenario(
     output_json: _JsonFlag = False,
 ) -> None:
     """Compare operating costs across road surface types (asphalt/gravel/concrete)."""
-    from haulpave.economics.compare import ComparisonResult, RoadScenario, compare_scenarios
+    from haulpave.economics.compare import RoadScenario, compare_scenarios
 
     with input_path.open(encoding="utf-8") as f:
         data: Any = json.load(f)
