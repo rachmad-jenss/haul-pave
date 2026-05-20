@@ -18,7 +18,6 @@ References
 
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -121,14 +120,11 @@ def design_pavement(
     cesa_result = compute_cesa(traffic)
     cov_result = compute_coverages(traffic)
     curve_data = load_curve_data(curve_id)
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        thickness, _was_clamped = interpolate_thickness(
-            curve_data,
-            cbr=subgrade_cbr,
-            coverages=cov_result.total_coverages,
-        )
-    was_clamped = _was_clamped or any("clamped" in str(msg.message).lower() for msg in w)
+    thickness, was_clamped = interpolate_thickness(
+        curve_data,
+        cbr=subgrade_cbr,
+        coverages=cov_result.total_coverages,
+    )
     return PavementResult(
         total_cesa=cesa_result.total_cesa,
         total_coverages=cov_result.total_coverages,
