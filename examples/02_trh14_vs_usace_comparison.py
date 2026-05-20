@@ -59,19 +59,19 @@ def main() -> None:
     print(f"\nMethod: {compare_methods.__doc__.strip().split(chr(10))[0]}")
 
     cbr_result = compare_methods(traffic, subgrade_cbr=5.0)
-    print(f"\n--- Detail at CBR 5% ---")
-    print(f"  USACE:")
+    print("\n--- Detail at CBR 5% ---")
+    print("  USACE:")
     print(f"    CESA:           {cbr_result.usace.total_cesa:,.0f}")
     print(f"    Coverages:      {cbr_result.usace.total_coverages:,.0f}")
     print(f"    Design wheel:   {cbr_result.usace.design_wheel_load_kn:.1f} kN")
     print(f"    Thickness:      {cbr_result.usace.required_thickness_mm:.1f} mm")
-    print(f"  TRH 14:")
+    print("  TRH 14:")
     print(f"    Material class: {cbr_result.trh14.material_class}")
     print(f"    Coverages:      {cbr_result.trh14.total_coverages:,.0f}")
     print(f"    Thickness:      {cbr_result.trh14.total_thickness_mm:.1f} mm")
     print(f"  Delta (TRH14 - USACE): {cbr_result.delta_mm:+.1f} mm")
 
-    print(f"\nExample 02 completed successfully.")
+    print("\nExample 02 completed successfully.")
 
 
 if __name__ == "__main__":

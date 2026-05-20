@@ -7,9 +7,9 @@ Demonstrates two economics calculations:
 Run: python examples/03_economics_scenario.py
 """
 
-from haulpave.models.economics import CostAssumptions, CostScenario
-from haulpave.economics.engine import compute_economics as compute_operating_cost
 from haulpave.economics.compare import RoadScenario, compare_scenarios
+from haulpave.economics.engine import compute_economics as compute_operating_cost
+from haulpave.models.economics import CostAssumptions, CostScenario
 
 
 def main() -> None:
@@ -40,7 +40,7 @@ def main() -> None:
     print(f"  Scenario:           {econ.scenario_id}")
     print(f"  Cost per trip:      ${econ.cost_per_trip:,.2f}")
     print(f"  Cost per tonne-km:  ${econ.cost_per_tonne_km:.4f}")
-    print(f"  Breakdown (per trip):")
+    print("  Breakdown (per trip):")
     print(f"    Fuel:             ${econ.fuel_cost_per_trip:,.2f}")
     print(f"    Tyre:             ${econ.tyre_cost_per_trip:,.2f}")
     print(f"    Maintenance:      ${econ.maintenance_cost_per_trip:,.2f}")
@@ -96,9 +96,9 @@ def main() -> None:
 
     print(f"\n  Method:     {comp.method}")
     print(f"  Confidence: {comp.confidence}")
-    print(f"  (Gravel should be highest, concrete lowest)")
+    print("  (Gravel should be highest, concrete lowest)")
 
-    print(f"\nExample 03 completed successfully.")
+    print("\nExample 03 completed successfully.")
 
 
 if __name__ == "__main__":
