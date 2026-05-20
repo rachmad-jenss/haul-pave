@@ -7,7 +7,32 @@ HaulPave uses [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.3.0] — 2026-05-03
+## [0.4.1] — 2026-05-20
+
+### Added
+- **CLI commands** (`haulpave.cli.main`): `economics`, `scenario`, `export` — operating cost, rolling-resistance comparison, and Excel export from the command line (DAS-76)
+- **Sensitivity analysis** (`haulpave.analysis.sensitivity`): `analyze_sensitivity()` — perturb CBR, coverages, or design life ±range_pct%, returns thickness impact (DAS-77)
+- **Unit conversion** (`haulpave.utils.units`): 18 imperial↔SI conversion functions with NIST-exact factors — psi↔kPa, tons↔tonnes, inches↔mm, mph↔km/h, etc. (DAS-78)
+- **Report input hash**: SHA-256 audit trail in `DesignSummary.input_hash` + `compute_input_hash()` helper (DAS-79)
+
+### Changed
+- `RoadScenario.thickness_mm` removed — field was accepted but never used in calculations (DAS-80)
+
+### Technical
+- 340+ unit + benchmark tests, ~98% coverage
+- 100% coverage on all new modules (material_library, cli, analysis, utils.units, reporting)
+
+## [0.4.0] — 2026-05-20
+
+### Added
+- Confidence label alignment (`high`/`medium`/`low` for all results)
+- `PavementResult` fields: `total_thickness_mm`, `subgrade_cbr`, `layers`, `was_clamped`
+- TRH14 public API export from `haulpave.pavement`
+- Clamping feedback (`was_clamped` flag) on all design results
+
+### Technical
+- API refinements for haul-calc compatibility (DAS-73)
+- 294+ unit tests, 97% coverage
 
 ### Added
 - **Vehicle registry** (`haulpave.vehicle_registry`): `list_all()`, `find_by_id()` with 4 OEM mining trucks — CAT 797F (6104 kN), KOM 960E (5925 kN), CAT 789D (3304 kN), CAT 785D (2641 kN). Axle loads follow 25/75 front/rear split per CAT Performance Handbook Ed. 47 (DAS-267)

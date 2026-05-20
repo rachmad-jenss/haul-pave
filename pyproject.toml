@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "haulpave"
-version = "0.4.0"
+version = "0.4.1"
 description = "Open-source pavement structure and operating-cost analysis toolkit for mine haul roads"
 readme = "README.md"
 license = { text = "MIT" }
