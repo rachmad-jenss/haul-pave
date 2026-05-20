@@ -82,8 +82,25 @@ print(summary.package_version, summary.generated_at)
 | `haulpave.traffic.cesa` | `compute_cesa(TrafficInput)` → `CesaResult` |
 | `haulpave.traffic.coverages` | `compute_coverages(TrafficInput)` → `CoveragesResult` |
 | `haulpave.pavement` | `cbr_thickness_from_coverages()`, `trh14_thickness_from_coverages()`, `design_pavement()` |
-| `haulpave.economics` | `compare_scenarios([RoadScenario])` → `ComparisonResult` |
-| `haulpave.reporting` | `build_design_summary(inputs, results)` → `DesignSummary` |
+| `haulpave.economics` | `compute_economics()`, `compare_scenarios([RoadScenario])` → `ComparisonResult` |
+| `haulpave.economics.export` | `export_comparison_to_excel(ComparisonResult, path)` |
+| `haulpave.reporting` | `build_design_summary()`, `compute_input_hash()` → `DesignSummary` |
+| `haulpave.analysis` | `analyze_sensitivity(traffic, cbr, variable)` → `SensitivityResult` |
+| `haulpave.utils.units` | 18 imperial↔SI conversion helpers (psi↔kPa, mph↔km/h, etc.) |
+
+## CLI Commands
+
+`haulpave --help`
+
+| Command | Description |
+|---------|-------------|
+| `cesa` | Compute CESA from a traffic JSON file |
+| `coverages` | Compute design coverages (USACE TM 5-822-12) |
+| `design` | Run USACE CBR pavement design |
+| `compare` | Compare USACE vs TRH 14 methods |
+| `economics` | Compute operating cost from a scenario JSON |
+| `scenario` | Compare costs across road surface types (asphalt/gravel/concrete) |
+| `export` | Export scenario comparison to Excel (.xlsx) |
 
 ## Built-in Vehicle Registry
 
@@ -104,7 +121,7 @@ Four OEM mining trucks with GVW and 25/75 front/rear axle-load split (CAT Perfor
 | Phase 1 — MVP | CESA engine, coverages engine, CBR pavement design | ✅ Done (v0.1.0) |
 | Phase 2 — TRH 14 + comparison | TRH 14 engine, USACE vs TRH 14 comparison | ✅ Done (v0.2.0) |
 | Phase 3 — Economics + registry | Vehicle registry, rolling-resistance cost model, design summary | ✅ Done (v0.3.0) |
-| Phase 4 — Docs + community | MkDocs site, case studies, CLI polish | ⏳ Planned (2026-Q4) |
+| Phase 4 — Docs + community | MkDocs site, case studies, sensitivity analysis, unit conversion, CLI commands | ✅ Done (v0.4.0) |
 
 ## Design Principles
 
