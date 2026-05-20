@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+from pydantic import ValidationError
+
 from haulpave.reporting.summary import DesignSummary, build_design_summary
 
 
@@ -30,5 +32,5 @@ class TestBuildDesignSummary:
 
     def test_immutable(self) -> None:
         result = build_design_summary(inputs={"cbr": 10})
-        with pytest.raises(Exception):
+        with pytest.raises((AttributeError, TypeError, ValidationError)):
             result.title = "Changed"  # type: ignore[misc]

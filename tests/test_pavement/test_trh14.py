@@ -236,11 +236,10 @@ class TestInterpolateCatalog:
         with pytest.raises(ValueError, match="Catalog shape mismatch"):
             _interpolate_catalog([150.0, 300.0], [100, 1000, 10000], 1000.0)
 
-    def test_fallthrough_upper_boundary(self) -> None:
-        """Coverages equal to the catalog maximum triggers fall-through return."""
-        with pytest.warns(UserWarning, match="below catalog minimum"):
-            result = _interpolate_catalog([600.0, 300.0], [10000, 100], 100.0)
-        assert result == 300.0
+    def test_shape_mismatch_with_single_value(self) -> None:
+        """Single thickness value with multi-element coverage also raises."""
+        with pytest.raises(ValueError, match="Catalog shape mismatch"):
+            _interpolate_catalog([150.0], [100, 1000, 10000], 1000.0)
 
 
 # ---------------------------------------------------------------------------
