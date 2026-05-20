@@ -13,6 +13,7 @@ def test_version_is_set() -> None:
 
 
 def test_subpackages_importable() -> None:
+    import haulpave.analysis  # noqa: F401
     import haulpave.design  # noqa: F401
     import haulpave.economics  # noqa: F401
     import haulpave.material_library  # noqa: F401
