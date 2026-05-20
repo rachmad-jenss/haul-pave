@@ -162,7 +162,10 @@ def interpolate_catalog(
         if log_levels[i] <= log_cov <= log_levels[i + 1]:
             span = log_levels[i + 1] - log_levels[i]
             frac = (log_cov - log_levels[i]) / span if span > 0 else 0.0
-            return thickness_values[i] + frac * (thickness_values[i + 1] - thickness_values[i]), was_clamped
+            return (
+                thickness_values[i] + frac * (thickness_values[i + 1] - thickness_values[i]),
+                was_clamped,
+            )
 
     # Clamped value equals the upper boundary exactly
     return float(thickness_values[-1]), was_clamped  # pragma: no cover

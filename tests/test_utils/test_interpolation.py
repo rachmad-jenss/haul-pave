@@ -176,7 +176,9 @@ class TestInterpolateThickness:
     def test_coverages_above_max_clamps_to_max_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """Coverages above curve maximum are clamped to maximum coverage level (100000)."""
         with pytest.warns(UserWarning, match="exceed curve maximum"):
-            result_clamped, was_clamped = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
+            result_clamped, was_clamped = interpolate_thickness(
+                curve_data, cbr=10, coverages=1_000_000
+            )
         result_max, _ = interpolate_thickness(curve_data, cbr=10, coverages=100_000)
         assert was_clamped, "Expected was_clamped=True when coverages exceed maximum"
         assert result_clamped == result_max, (

@@ -173,7 +173,9 @@ def cbr_thickness_from_coverages(
         Required total pavement thickness [mm].
     """
     curve_data = load_curve_data(curve_id)
-    thickness, _was_clamped = interpolate_thickness(curve_data, cbr=subgrade_cbr, coverages=design_coverages)
+    thickness, _was_clamped = interpolate_thickness(
+        curve_data, cbr=subgrade_cbr, coverages=design_coverages
+    )
     return thickness
 
 
@@ -206,8 +208,8 @@ def trh14_thickness_from_coverages(
     """
     from haulpave.pavement.trh14 import (
         TRH14Result,
-        interpolate_catalog,
         cbr_to_material_class,
+        interpolate_catalog,
         load_catalog,
     )
 
@@ -226,7 +228,9 @@ def trh14_thickness_from_coverages(
 
     coverage_levels: list[int] = catalog["coverage_levels"]
     thickness_values: list[float] = thickness_table[g_class]
-    thickness, was_clamped = interpolate_catalog(thickness_values, coverage_levels, design_coverages)
+    thickness, was_clamped = interpolate_catalog(
+        thickness_values, coverage_levels, design_coverages
+    )
 
     return TRH14Result(
         material_class=g_class,
