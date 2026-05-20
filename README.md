@@ -109,7 +109,7 @@ Four OEM mining trucks with GVW and 25/75 front/rear axle-load split (CAT Perfor
 ## Design Principles
 
 - **Benchmark-first**: every calculation method is tested against hand-computed examples before engine code is written.
-- **Confidence labeling**: `benchmark_tested` / `method_implemented` / `experimental` on all outputs.
+- **Confidence labeling**: `high` / `medium` / `low` on all outputs (v0.4.0+).
 - **Honest documentation**: explicit assumptions, limitations, and method references.
 - **SI units internally**: mm, km, kN, kPa, tonnes — no implicit unit mixing.
 - **Open-source hygiene**: no proprietary data redistribution; OEM data requires source attribution.
