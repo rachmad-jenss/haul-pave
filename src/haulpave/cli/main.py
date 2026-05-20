@@ -205,10 +205,17 @@ def scenario(
     if output_json:
         typer.echo(result.model_dump_json(indent=2))
     else:
-        typer.echo(f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}")
+        typer.echo(
+            f"{'Surface':>10}  {'Fuel ($/yr)':>14}  {'Tyres ($/yr)':>14}"
+            f"  {'Maint ($/yr)':>14}  {'Total ($/yr)':>14}"
+        )
         typer.echo("-" * 72)
         for sc in result.scenarios:
-            total = sc.fuel_cost_usd_per_year + sc.tire_cost_usd_per_year + sc.maintenance_cost_usd_per_year
+            total = (
+                sc.fuel_cost_usd_per_year
+                + sc.tire_cost_usd_per_year
+                + sc.maintenance_cost_usd_per_year
+            )
             typer.echo(
                 f"{sc.name:>10}  {sc.fuel_cost_usd_per_year:>14,.0f}  "
                 f"{sc.tire_cost_usd_per_year:>14,.0f}  "
