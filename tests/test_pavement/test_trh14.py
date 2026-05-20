@@ -179,6 +179,7 @@ class TestComputeTrh14CoverageClamping:
             result = compute_trh14(traffic_low, subgrade_cbr=10.0)
         assert result.total_coverages < 100  # confirms input is below catalog min
         assert result.total_thickness_mm == pytest.approx(150.0, abs=1e-6)  # G5 @ min knot
+        assert result.was_clamped  # clamping flag must be True
 
     def test_very_high_coverages_clamped(self) -> None:
         """Extremely heavy traffic → coverages above catalog maximum, clamped downward."""
@@ -197,6 +198,7 @@ class TestComputeTrh14CoverageClamping:
             result = compute_trh14(traffic_heavy, subgrade_cbr=10.0)
         assert result.total_coverages > 1_000_000  # confirms input is above catalog max
         assert result.total_thickness_mm == pytest.approx(600.0, abs=1e-6)  # G5 @ max knot
+        assert result.was_clamped  # clamping flag must be True
 
 
 # ---------------------------------------------------------------------------
