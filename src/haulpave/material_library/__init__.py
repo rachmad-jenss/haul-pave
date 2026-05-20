@@ -49,9 +49,7 @@ class MaterialTemplate(BaseModel):
     cbr_range: tuple[float, float | None] = Field(
         description="(min, max) CBR bounds [%]; None = unbounded upper"
     )
-    typical_modulus_mpa: float = Field(
-        gt=0, description="Typical elastic modulus [MPa]"
-    )
+    typical_modulus_mpa: float = Field(gt=0, description="Typical elastic modulus [MPa]")
     source: str = Field(min_length=1, description="Provenance reference for template data")
 
 
