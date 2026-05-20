@@ -14,7 +14,6 @@ import pytest
 from haulpave.analysis.sensitivity import analyze_sensitivity
 from haulpave.models.traffic import TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
-
 from tests.conftest import make_traffic
 
 

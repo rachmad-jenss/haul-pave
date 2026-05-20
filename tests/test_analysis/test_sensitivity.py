@@ -7,7 +7,6 @@ import pytest
 from haulpave.analysis.sensitivity import SensitivityResult, analyze_sensitivity
 from haulpave.models.traffic import TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
-
 from tests.conftest import make_traffic
 
 
@@ -37,29 +36,21 @@ class TestAnalyzeSensitivity:
         assert result.baseline == 10.0
         assert len(result.perturbations) == 5
 
-    def test_cbr_sensitivity_perturbations_ordered(
-        self, test_traffic: TrafficInput
-    ) -> None:
+    def test_cbr_sensitivity_perturbations_ordered(self, test_traffic: TrafficInput) -> None:
         result = analyze_sensitivity(test_traffic, subgrade_cbr=10.0, variable="cbr")
         cbr_vals = [p[0] for p in result.perturbations]
         thickness_vals = [p[1] for p in result.perturbations]
         assert cbr_vals == sorted(cbr_vals)
         assert thickness_vals == sorted(thickness_vals, reverse=True)
 
-    def test_cbr_sensitivity_midpoint_matches_baseline(
-        self, test_traffic: TrafficInput
-    ) -> None:
+    def test_cbr_sensitivity_midpoint_matches_baseline(self, test_traffic: TrafficInput) -> None:
         result = analyze_sensitivity(test_traffic, subgrade_cbr=10.0, variable="cbr")
         mid_cbr, _mid_thk = result.perturbations[2]
         assert mid_cbr == pytest.approx(10.0)
 
-    def test_cbr_sensitivity_clamps_at_boundary(
-        self, test_vehicle: MiningVehicle
-    ) -> None:
+    def test_cbr_sensitivity_clamps_at_boundary(self, test_vehicle: MiningVehicle) -> None:
         traffic = make_traffic(test_vehicle, trips=10, life_years=10, days_per_year=350)
-        result = analyze_sensitivity(
-            traffic, subgrade_cbr=3.0, variable="cbr", range_pct=90.0
-        )
+        result = analyze_sensitivity(traffic, subgrade_cbr=3.0, variable="cbr", range_pct=90.0)
         cbr_vals = [p[0] for p in result.perturbations]
         from haulpave.utils.interpolation import load_curve_data
 
