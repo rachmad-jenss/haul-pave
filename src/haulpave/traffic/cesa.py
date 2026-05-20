@@ -57,9 +57,7 @@ class CesaResult:
 
     total_cesa: float
     method: str = "AASHTO 4th-power LEF (AASHTO 1993)"
-    confidence: Literal["high", "medium", "low"] = (
-        "high"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def _lef_for_axle_group(group: AxleGroup) -> float:

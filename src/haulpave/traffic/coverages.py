@@ -66,9 +66,7 @@ class CoveragesResult:
     total_coverages: float
     design_wheel_load_kn: float
     method: str = "USACE TM 5-822-12 pass-count method"
-    confidence: Literal["high", "medium", "low"] = (
-        "high"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def _wheel_load_kn(group: AxleGroup) -> float:

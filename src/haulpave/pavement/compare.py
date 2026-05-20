@@ -67,9 +67,7 @@ class ComparisonResult:
     subgrade_cbr: float
     curve_id: str
     method: str = "USACE TM 5-822-12 CBR vs TRH 14 (CSRA 1985) comparison"
-    confidence: Literal["high", "medium", "low"] = (
-        "high"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def compare_methods(

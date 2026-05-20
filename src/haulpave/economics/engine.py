@@ -68,9 +68,7 @@ class EconomicsResult:
     annual_cost: float
     currency: str
     method: str = "haulpave-economics-v1"
-    confidence: Literal["high", "medium", "low"] = (
-        "medium"
-    )
+    confidence: Literal["high", "medium", "low"] = "medium"
 
 
 def compute_economics(

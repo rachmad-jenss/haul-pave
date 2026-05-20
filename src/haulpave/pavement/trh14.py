@@ -201,9 +201,7 @@ class TRH14Result:
     design_wheel_load_kn: float
     was_clamped: bool = False
     method: str = "TRH 14 (CSRA 1985) design catalog + USACE design-coverages"
-    confidence: Literal["high", "medium", "low"] = (
-        "high"
-    )
+    confidence: Literal["high", "medium", "low"] = "high"
 
 
 def compute_trh14(traffic: TrafficInput, subgrade_cbr: float) -> TRH14Result:
