@@ -8,12 +8,12 @@ import pytest
 
 openpyxl = pytest.importorskip("openpyxl", reason="openpyxl is required for Excel export tests")
 
-from haulpave.economics.compare import (
+from haulpave.economics.compare import (  # noqa: E402
     ComparisonResult,
     RoadScenario,
     compare_scenarios,
 )
-from haulpave.economics.export import export_comparison_to_excel
+from haulpave.economics.export import export_comparison_to_excel  # noqa: E402
 
 
 @pytest.fixture()
