@@ -37,7 +37,7 @@ def export_comparison_to_excel(comparison: ComparisonResult, filepath: str | Pat
     header_font = Font(bold=True, size=11)
     header_fill = PatternFill(start_color="D9E1F2", end_color="D9E1F2", fill_type="solid")
     total_font = Font(bold=True, size=11)
-    money_fmt = '#,##0.00'
+    money_fmt = "#,##0.00"
 
     # -- metadata block ----------------------------------------------------
     ws["A1"] = "Method"
@@ -51,6 +51,7 @@ def export_comparison_to_excel(comparison: ComparisonResult, filepath: str | Pat
     ws["A3"] = "Generated At"
     ws["A3"].font = header_font
     from datetime import datetime, timezone
+
     ws["B3"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # -- header row --------------------------------------------------------
@@ -72,9 +73,7 @@ def export_comparison_to_excel(comparison: ComparisonResult, filepath: str | Pat
     for i, sc in enumerate(comparison.scenarios, start=1):
         row = header_row + i
         total = (
-            sc.fuel_cost_usd_per_year
-            + sc.tire_cost_usd_per_year
-            + sc.maintenance_cost_usd_per_year
+            sc.fuel_cost_usd_per_year + sc.tire_cost_usd_per_year + sc.maintenance_cost_usd_per_year
         )
 
         ws.cell(row=row, column=1, value=sc.name)

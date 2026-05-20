@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+openpyxl = pytest.importorskip("openpyxl", reason="openpyxl is required for Excel export tests")
+
 from haulpave.economics.compare import (
     ComparisonResult,
     RoadScenario,
@@ -18,16 +20,25 @@ from haulpave.economics.export import export_comparison_to_excel
 def comparison_result() -> ComparisonResult:
     scenarios = [
         RoadScenario(
-            name="Asphalt", surface="asphalt",
-            thickness_mm=100, haul_distance_km=5.0, trips_per_day=20,
+            name="Asphalt",
+            surface="asphalt",
+            thickness_mm=100,
+            haul_distance_km=5.0,
+            trips_per_day=20,
         ),
         RoadScenario(
-            name="Gravel", surface="gravel",
-            thickness_mm=600, haul_distance_km=5.0, trips_per_day=20,
+            name="Gravel",
+            surface="gravel",
+            thickness_mm=600,
+            haul_distance_km=5.0,
+            trips_per_day=20,
         ),
         RoadScenario(
-            name="Concrete", surface="concrete",
-            thickness_mm=200, haul_distance_km=5.0, trips_per_day=20,
+            name="Concrete",
+            surface="concrete",
+            thickness_mm=200,
+            haul_distance_km=5.0,
+            trips_per_day=20,
         ),
     ]
     return compare_scenarios(scenarios)
@@ -35,7 +46,9 @@ def comparison_result() -> ComparisonResult:
 
 class TestExportComparisonToExcel:
     def test_export_creates_valid_xlsx(
-        self, comparison_result: ComparisonResult, tmp_path: Path,
+        self,
+        comparison_result: ComparisonResult,
+        tmp_path: Path,
     ) -> None:
         filepath = tmp_path / "comparison.xlsx"
         result = export_comparison_to_excel(comparison_result, filepath)
@@ -43,9 +56,10 @@ class TestExportComparisonToExcel:
         assert Path(result).suffix == ".xlsx"
 
     def test_export_file_can_be_opened(
-        self, comparison_result: ComparisonResult, tmp_path: Path,
+        self,
+        comparison_result: ComparisonResult,
+        tmp_path: Path,
     ) -> None:
-        import openpyxl
         filepath = tmp_path / "comparison.xlsx"
         export_comparison_to_excel(comparison_result, filepath)
         wb = openpyxl.load_workbook(filepath)
@@ -55,9 +69,10 @@ class TestExportComparisonToExcel:
         wb.close()
 
     def test_all_scenarios_present(
-        self, comparison_result: ComparisonResult, tmp_path: Path,
+        self,
+        comparison_result: ComparisonResult,
+        tmp_path: Path,
     ) -> None:
-        import openpyxl
         filepath = tmp_path / "comparison.xlsx"
         export_comparison_to_excel(comparison_result, filepath)
         wb = openpyxl.load_workbook(filepath)
@@ -70,16 +85,19 @@ class TestExportComparisonToExcel:
         wb.close()
 
     def test_export_returns_absolute_path(
-        self, comparison_result: ComparisonResult, tmp_path: Path,
+        self,
+        comparison_result: ComparisonResult,
+        tmp_path: Path,
     ) -> None:
         filepath = tmp_path / "comparison.xlsx"
         result = export_comparison_to_excel(comparison_result, filepath)
         assert result == str(Path(filepath).resolve())
 
     def test_metadata_present(
-        self, comparison_result: ComparisonResult, tmp_path: Path,
+        self,
+        comparison_result: ComparisonResult,
+        tmp_path: Path,
     ) -> None:
-        import openpyxl
         filepath = tmp_path / "comparison.xlsx"
         export_comparison_to_excel(comparison_result, filepath)
         wb = openpyxl.load_workbook(filepath)
