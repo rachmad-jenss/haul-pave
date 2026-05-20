@@ -93,7 +93,6 @@ rolling-resistance linear cost model.
 class RoadScenario(BaseModel):
     name: str
     surface: Literal["asphalt", "gravel", "concrete"]
-    thickness_mm: float  # Pavement design thickness [mm]
     haul_distance_km: float  # One-way haul distance [km]
     trips_per_day: float  # One-way vehicle trips per day
 ```

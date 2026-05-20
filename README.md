@@ -57,9 +57,9 @@ print(f"Required thickness: {thickness_mm:.0f} mm")
 
 # 4. Compare surface scenarios
 scenarios = [
-    RoadScenario(name="Asphalt", surface="asphalt", thickness_mm=thickness_mm,
+    RoadScenario(name="Asphalt", surface="asphalt",
                  haul_distance_km=10, trips_per_day=30),
-    RoadScenario(name="Gravel",  surface="gravel",  thickness_mm=400,
+    RoadScenario(name="Gravel",  surface="gravel",
                  haul_distance_km=10, trips_per_day=30),
 ]
 comparison = compare_scenarios(scenarios)
