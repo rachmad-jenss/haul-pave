@@ -9,34 +9,10 @@ from __future__ import annotations
 import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
-from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
+from haulpave.models.vehicle import MiningVehicle
 from haulpave.pavement import PavementResult, design_pavement
 
-# ---------------------------------------------------------------------------
-# Shared fixtures
-# ---------------------------------------------------------------------------
-
-_PLACEHOLDER_TIRE = TireSpec(contact_pressure_kpa=700.0, contact_area_mm2=50000.0)
-
-
-def _single(load_kn: float) -> AxleGroup:
-    """Single axle group: 1 axle, 2 tyres."""
-    return AxleGroup(
-        axle_count=1,
-        tyres_per_axle=2,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
-
-
-def _tandem(load_kn: float) -> AxleGroup:
-    """Tandem axle group: 2 axles, 4 tyres per axle (dual-tyre stations)."""
-    return AxleGroup(
-        axle_count=2,
-        tyres_per_axle=4,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
+from ..conftest import make_single_axle, make_tandem_axle
 
 
 @pytest.fixture()
@@ -46,8 +22,8 @@ def simple_traffic() -> TrafficInput:
         name="Test Truck",
         gross_vehicle_mass_t=100.0,
         axle_groups=[
-            _single(200.0),
-            _tandem(600.0),
+            make_single_axle(200.0),
+            make_tandem_axle(600.0),
         ],
         source="Unit test fixture",
     )
@@ -65,8 +41,8 @@ def fleet_b_traffic() -> TrafficInput:
         name="CAT 785D",
         gross_vehicle_mass_t=269.0,
         axle_groups=[
-            _single(225.0),
-            _tandem(1040.0),
+            make_single_axle(225.0),
+            make_tandem_axle(1040.0),
         ],
         source="Caterpillar 785D Specifications",
     )
@@ -74,8 +50,8 @@ def fleet_b_traffic() -> TrafficInput:
         name="Motor Grader (25 t)",
         gross_vehicle_mass_t=25.0,
         axle_groups=[
-            _single(85.0),
-            _tandem(160.0),
+            make_single_axle(85.0),
+            make_tandem_axle(160.0),
         ],
         source="Generic motor grader",
     )

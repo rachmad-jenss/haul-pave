@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from haulpave.models.traffic import FleetUnit
+from haulpave.models.traffic import FleetUnit, TrafficInput
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
 
 # --- Tire fixtures ---
@@ -143,6 +143,69 @@ def fleet_light(vehicle_cat_777g: MiningVehicle) -> list[FleetUnit]:
         FleetUnit(vehicle=vehicle_cat_777g, trips_per_day=50.0),
         FleetUnit(vehicle=water_truck, trips_per_day=10.0),
     ]
+
+
+# --- Shared test helpers (plain functions — not fixtures, because they take parameters) ---
+
+PLACEHOLDER_TIRE = TireSpec(contact_pressure_kpa=700.0, contact_area_mm2=50000.0)
+
+
+def make_single_axle(load_kn: float) -> AxleGroup:
+    """Single axle: 1 axle, 2 tyres per axle."""
+    return AxleGroup(
+        axle_count=1,
+        tyres_per_axle=2,
+        gross_load_kn=load_kn,
+        tire_spec=PLACEHOLDER_TIRE,
+    )
+
+
+def make_tandem_axle(load_kn: float) -> AxleGroup:
+    """Tandem axle group: 2 axles, 4 tyres per axle (dual-tyre stations)."""
+    return AxleGroup(
+        axle_count=2,
+        tyres_per_axle=4,
+        gross_load_kn=load_kn,
+        tire_spec=PLACEHOLDER_TIRE,
+    )
+
+
+def make_tridem_axle(load_kn: float) -> AxleGroup:
+    """Tridem axle group: 3 axles, 4 tyres per axle."""
+    return AxleGroup(
+        axle_count=3,
+        tyres_per_axle=4,
+        gross_load_kn=load_kn,
+        tire_spec=PLACEHOLDER_TIRE,
+    )
+
+
+def make_vehicle(
+    name: str,
+    axle_groups: list[AxleGroup],
+    gvm_t: float = 50.0,
+) -> MiningVehicle:
+    """Create a MiningVehicle with a synthetic source string."""
+    return MiningVehicle(
+        name=name,
+        gross_vehicle_mass_t=gvm_t,
+        axle_groups=axle_groups,
+        source="Synthetic vehicle for unit tests",
+    )
+
+
+def make_traffic(
+    vehicle: MiningVehicle,
+    trips: float = 10,
+    life_years: float = 10,
+    days_per_year: int = 350,
+) -> TrafficInput:
+    """Create a TrafficInput with a single-vehicle fleet."""
+    return TrafficInput(
+        fleet=[FleetUnit(vehicle=vehicle, trips_per_day=trips)],
+        design_life_years=life_years,
+        working_days_per_year=days_per_year,
+    )
 
 
 # --- Assertion helpers ---

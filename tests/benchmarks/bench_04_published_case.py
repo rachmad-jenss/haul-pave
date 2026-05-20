@@ -90,29 +90,9 @@ SUBGRADE_CBR = CASE["subgrade_cbr"]  # 7
 # Fleet B fixtures — identical to bench_01 / bench_02 Fleet B
 # ---------------------------------------------------------------------------
 from haulpave.models.traffic import FleetUnit, TrafficInput  # noqa: E402
-from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec  # noqa: E402
+from haulpave.models.vehicle import MiningVehicle  # noqa: E402
 
-_PLACEHOLDER_TIRE = TireSpec(contact_pressure_kpa=700.0, contact_area_mm2=50000.0)
-
-
-def _single(load_kn: float) -> AxleGroup:
-    """Single axle group: 1 axle, 2 tyres."""
-    return AxleGroup(
-        axle_count=1,
-        tyres_per_axle=2,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
-
-
-def _tandem(load_kn: float) -> AxleGroup:
-    """Tandem axle group: 2 axles, 4 tyres per axle (dual-tyre stations)."""
-    return AxleGroup(
-        axle_count=2,
-        tyres_per_axle=4,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
+from ..conftest import make_single_axle, make_tandem_axle  # noqa: E402
 
 
 @pytest.fixture()
@@ -142,8 +122,8 @@ def fleet_b_input() -> TrafficInput:
         name="CAT 785D",
         gross_vehicle_mass_t=cat_ref["gross_vehicle_mass_t"],
         axle_groups=[
-            _single(cat_ref["front_axle_load_kN"]),
-            _tandem(cat_ref["rear_tandem_load_kN"]),
+            make_single_axle(cat_ref["front_axle_load_kN"]),
+            make_tandem_axle(cat_ref["rear_tandem_load_kN"]),
         ],
         source="Caterpillar 785D Specifications, CAT Performance Handbook Ed. 47",
     )
@@ -151,8 +131,8 @@ def fleet_b_input() -> TrafficInput:
         name="Motor Grader (25 t)",
         gross_vehicle_mass_t=grader_ref["gross_vehicle_mass_t"],
         axle_groups=[
-            _single(grader_ref["front_axle_load_kN"]),
-            _tandem(grader_ref["rear_tandem_load_kN"]),
+            make_single_axle(grader_ref["front_axle_load_kN"]),
+            make_tandem_axle(grader_ref["rear_tandem_load_kN"]),
         ],
         source="Generic motor grader — conservative estimate based on GVM",
     )

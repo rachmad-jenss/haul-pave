@@ -13,33 +13,12 @@ from __future__ import annotations
 import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
-from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
+from haulpave.models.vehicle import MiningVehicle
 from haulpave.pavement import PavementResult, compare_methods
 from haulpave.pavement.compare import ComparisonResult
 from haulpave.pavement.trh14 import TRH14Result
 
-# ---------------------------------------------------------------------------
-# Shared fixtures
-# ---------------------------------------------------------------------------
-_PLACEHOLDER_TIRE = TireSpec(contact_pressure_kpa=700.0, contact_area_mm2=50000.0)
-
-
-def _single(load_kn: float) -> AxleGroup:
-    return AxleGroup(
-        axle_count=1,
-        tyres_per_axle=2,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
-
-
-def _tandem(load_kn: float) -> AxleGroup:
-    return AxleGroup(
-        axle_count=2,
-        tyres_per_axle=4,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
+from ..conftest import make_single_axle, make_tandem_axle
 
 
 @pytest.fixture()
@@ -52,7 +31,7 @@ def fleet_d() -> TrafficInput:
     truck = MiningVehicle(
         name="Generic 100t Haul Truck",
         gross_vehicle_mass_t=100.0,
-        axle_groups=[_single(130.0), _tandem(520.0)],
+        axle_groups=[make_single_axle(130.0), make_tandem_axle(520.0)],
         source="bench_05 design fixture",
     )
     return TrafficInput(

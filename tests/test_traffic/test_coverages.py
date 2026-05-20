@@ -16,7 +16,7 @@ import math
 import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
-from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
+from haulpave.models.vehicle import AxleGroup, MiningVehicle
 from haulpave.traffic.coverages import (
     CoveragesResult,
     _design_wheel_load_kn,
@@ -26,31 +26,7 @@ from haulpave.traffic.coverages import (
     compute_coverages,
 )
 
-# ---------------------------------------------------------------------------
-# Shared fixtures
-# ---------------------------------------------------------------------------
-
-_PLACEHOLDER_TIRE = TireSpec(contact_pressure_kpa=700.0, contact_area_mm2=50000.0)
-
-
-def _single_axle(load_kn: float) -> AxleGroup:
-    """Single axle: 1 axle, 2 tyres per axle."""
-    return AxleGroup(
-        axle_count=1,
-        tyres_per_axle=2,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
-
-
-def _tandem_axle(load_kn: float) -> AxleGroup:
-    """Tandem axle: 2 axles, 4 tyres per axle (dual-tyre stations)."""
-    return AxleGroup(
-        axle_count=2,
-        tyres_per_axle=4,
-        gross_load_kn=load_kn,
-        tire_spec=_PLACEHOLDER_TIRE,
-    )
+from ..conftest import PLACEHOLDER_TIRE, make_single_axle, make_tandem_axle
 
 
 def _make_vehicle(
@@ -111,27 +87,27 @@ class TestCoveragesResult:
 class TestWheelLoadKn:
     def test_single_axle_2tyres(self) -> None:
         """Single axle, 2 tyres, 155 kN → 77.5 kN/wheel."""
-        group = _single_axle(155.0)
+        group = make_single_axle(155.0)
         assert math.isclose(_wheel_load_kn(group), 77.5, rel_tol=1e-9)
 
     def test_single_axle_120kn(self) -> None:
         """Single axle, 2 tyres, 120 kN → 60.0 kN/wheel."""
-        group = _single_axle(120.0)
+        group = make_single_axle(120.0)
         assert math.isclose(_wheel_load_kn(group), 60.0, rel_tol=1e-9)
 
     def test_tandem_axle_760kn(self) -> None:
         """Tandem: 2 axles, 4 tyres/axle, 760 kN → 760/16 = 47.5 kN/wheel."""
-        group = _tandem_axle(760.0)
+        group = make_tandem_axle(760.0)
         assert math.isclose(_wheel_load_kn(group), 47.5, rel_tol=1e-9)
 
     def test_tandem_axle_1040kn(self) -> None:
         """Tandem: 2 axles, 4 tyres/axle, 1040 kN → 1040/16 = 65.0 kN/wheel."""
-        group = _tandem_axle(1040.0)
+        group = make_tandem_axle(1040.0)
         assert math.isclose(_wheel_load_kn(group), 65.0, rel_tol=1e-9)
 
     def test_tandem_axle_1900kn(self) -> None:
         """Tandem: 2 axles, 4 tyres/axle, 1900 kN → 1900/16 = 118.75 kN/wheel."""
-        group = _tandem_axle(1900.0)
+        group = make_tandem_axle(1900.0)
         assert math.isclose(_wheel_load_kn(group), 118.75, rel_tol=1e-9)
 
 
@@ -142,12 +118,12 @@ class TestWheelLoadKn:
 
 class TestWheelPositions:
     def test_single_axle_is_1(self) -> None:
-        group = _single_axle(100.0)
+        group = make_single_axle(100.0)
         assert _wheel_positions(group) == 1
 
     def test_tandem_axle_is_8(self) -> None:
         """Tandem: axle_count=2 * tyres_per_axle=4 = 8 positions."""
-        group = _tandem_axle(100.0)
+        group = make_tandem_axle(100.0)
         assert _wheel_positions(group) == 8
 
     def test_tridem_axle(self) -> None:
@@ -156,7 +132,7 @@ class TestWheelPositions:
             axle_count=3,
             tyres_per_axle=4,
             gross_load_kn=200.0,
-            tire_spec=_PLACEHOLDER_TIRE,
+            tire_spec=PLACEHOLDER_TIRE,
         )
         assert _wheel_positions(group) == 12
 
@@ -167,21 +143,21 @@ class TestWheelPositions:
 
 
 class TestDesignWheelLoad:
-    def test_single_vehicle_single_axle(self) -> None:
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(200.0)])
+    def test_single_vehicle_single_axle_design_wheel(self) -> None:
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(200.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         assert math.isclose(_design_wheel_load_kn(traffic), 100.0, rel_tol=1e-9)
 
     def test_picks_max_across_axle_groups(self) -> None:
         """Front axle load (77.5) > rear tandem load (47.5): design = 77.5."""
-        vehicle = _make_vehicle("V1", 186.0, [_single_axle(155.0), _tandem_axle(760.0)])
+        vehicle = _make_vehicle("V1", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])  # noqa: E501
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=50)])
         assert math.isclose(_design_wheel_load_kn(traffic), 77.5, rel_tol=1e-9)
 
     def test_picks_max_across_fleet(self) -> None:
         """Design load comes from the heaviest vehicle in the fleet."""
-        v1 = _make_vehicle("Light", 40.0, [_single_axle(120.0)])
-        v2 = _make_vehicle("Heavy", 186.0, [_single_axle(155.0)])
+        v1 = _make_vehicle("Light", 40.0, [make_single_axle(120.0)])
+        v2 = _make_vehicle("Heavy", 186.0, [make_single_axle(155.0)])
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=v1, trips_per_day=10),
@@ -192,8 +168,12 @@ class TestDesignWheelLoad:
 
     def test_fleet_a_design_wheel_load(self) -> None:
         """Fleet A: 77.5 kN (CAT 777G front axle ÷ 2)."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [_single_axle(155.0), _tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [_single_axle(120.0), _tandem_axle(270.0)])
+        cat_777g = _make_vehicle(
+            "CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)]
+        )  # noqa: E501
+        water_truck = _make_vehicle(
+            "Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)]
+        )  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),
@@ -214,7 +194,7 @@ class TestEquivPassesPerDay:
         positions * trips_per_day * 2 equiv passes per day.
         Single axle: 1 position. 10 trips × 2 directions = 20 passes.
         """
-        group = _single_axle(200.0)
+        group = make_single_axle(200.0)
         design_wheel_load = 100.0  # 200/2 = 100 kN
         result = _equiv_passes_per_day(
             [group], trips_per_day=10, design_wheel_load=design_wheel_load
@@ -225,7 +205,7 @@ class TestEquivPassesPerDay:
         """wheel_load = 50, design = 100 → ratio^4 = (0.5)^4 = 1/16.
         1 position × (0.5)^4 × 10 trips × 2 dirs = 20/16 = 1.25.
         """
-        group = _single_axle(100.0)  # wheel_load = 50
+        group = make_single_axle(100.0)  # wheel_load = 50
         result = _equiv_passes_per_day([group], trips_per_day=10, design_wheel_load=100.0)
         assert math.isclose(result, 20.0 / 16.0, rel_tol=1e-9)
 
@@ -233,7 +213,7 @@ class TestEquivPassesPerDay:
         """CAT 777G front axle: positions=1, wheel=77.5, design=77.5.
         ratio^4 = 1.0. trips=50 × 2 × 1 = 100.
         """
-        group = _single_axle(155.0)
+        group = make_single_axle(155.0)
         result = _equiv_passes_per_day([group], trips_per_day=50, design_wheel_load=77.5)
         assert math.isclose(result, 100.0, rel_tol=1e-6)
 
@@ -241,7 +221,7 @@ class TestEquivPassesPerDay:
         """CAT 777G rear tandem: positions=8, wheel=47.5, design=77.5.
         ratio = 47.5/77.5. positions × ratio^4 × 50 × 2 = 8 × 0.141113 × 100 ≈ 112.89.
         """
-        group = _tandem_axle(760.0)
+        group = make_tandem_axle(760.0)
         result = _equiv_passes_per_day([group], trips_per_day=50, design_wheel_load=77.5)
         expected = 8 * (47.5 / 77.5) ** 4 * 50 * 2
         assert math.isclose(result, expected, rel_tol=1e-6)
@@ -254,22 +234,22 @@ class TestEquivPassesPerDay:
 
 class TestComputeCoverages:
     def test_returns_coverages_result(self) -> None:
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(100.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         result = compute_coverages(traffic)
         assert isinstance(result, CoveragesResult)
 
     def test_method_contains_usace(self) -> None:
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(100.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         result = compute_coverages(traffic)
         assert "USACE" in result.method or "coverage" in result.method.lower()
 
-    def test_single_vehicle_single_axle(self) -> None:
+    def test_single_vehicle_single_axle_coverages(self) -> None:
         """Single vehicle, single axle: design = vehicle wheel load.
         Ratio = 1.0, so coverages = trips × 2 × 1_position × working_days × years.
         """
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(200.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(200.0)])
         traffic = _make_traffic(
             [FleetUnit(vehicle=vehicle, trips_per_day=10)],
             design_life=5.0,
@@ -282,8 +262,12 @@ class TestComputeCoverages:
 
     def test_fleet_a_total_coverages(self) -> None:
         """Fleet A hand-calc: 771,523.33 coverages (±2%)."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [_single_axle(155.0), _tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [_single_axle(120.0), _tandem_axle(270.0)])
+        cat_777g = _make_vehicle(
+            "CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)]
+        )  # noqa: E501
+        water_truck = _make_vehicle(
+            "Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)]
+        )  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),
@@ -300,9 +284,11 @@ class TestComputeCoverages:
 
     def test_fleet_b_total_coverages(self) -> None:
         """Fleet B hand-calc: 530,357.24 coverages (±2%)."""
-        cat_785d = _make_vehicle("CAT 785D", 269.0, [_single_axle(225.0), _tandem_axle(1040.0)])
+        cat_785d = _make_vehicle(
+            "CAT 785D", 269.0, [make_single_axle(225.0), make_tandem_axle(1040.0)]
+        )  # noqa: E501
         motor_grader = _make_vehicle(
-            "Motor Grader", 25.0, [_single_axle(85.0), _tandem_axle(160.0)]
+            "Motor Grader", 25.0, [make_single_axle(85.0), make_tandem_axle(160.0)]
         )
         traffic = _make_traffic(
             [
@@ -320,8 +306,12 @@ class TestComputeCoverages:
 
     def test_fleet_c_total_coverages(self) -> None:
         """Fleet C hand-calc: 268,531.80 coverages (±2%)."""
-        cat_793f = _make_vehicle("CAT 793F", 623.0, [_single_axle(550.0), _tandem_axle(1900.0)])
-        fuel_truck = _make_vehicle("Fuel Truck", 30.0, [_single_axle(100.0), _tandem_axle(200.0)])
+        cat_793f = _make_vehicle(
+            "CAT 793F", 623.0, [make_single_axle(550.0), make_tandem_axle(1900.0)]
+        )  # noqa: E501
+        fuel_truck = _make_vehicle(
+            "Fuel Truck", 30.0, [make_single_axle(100.0), make_tandem_axle(200.0)]
+        )  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_793f, trips_per_day=30),
@@ -338,8 +328,12 @@ class TestComputeCoverages:
 
     def test_design_wheel_load_fleet_a(self) -> None:
         """Fleet A design wheel load: 77.5 kN."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [_single_axle(155.0), _tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [_single_axle(120.0), _tandem_axle(270.0)])
+        cat_777g = _make_vehicle(
+            "CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)]
+        )  # noqa: E501
+        water_truck = _make_vehicle(
+            "Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)]
+        )  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),
@@ -351,7 +345,7 @@ class TestComputeCoverages:
 
     def test_coverages_scale_linearly_with_trips(self) -> None:
         """Doubling trips_per_day doubles total_coverages."""
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(200.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(200.0)])
         t1 = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         t2 = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=20)])
         r1 = compute_coverages(t1)
@@ -360,7 +354,7 @@ class TestComputeCoverages:
 
     def test_coverages_scale_linearly_with_design_life(self) -> None:
         """Doubling design_life_years doubles total_coverages."""
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(200.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(200.0)])
         t1 = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)], design_life=5.0)
         t2 = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)], design_life=10.0)
         r1 = compute_coverages(t1)
@@ -369,8 +363,8 @@ class TestComputeCoverages:
 
     def test_fourth_power_weighting(self) -> None:
         """Half wheel load → coverage contribution reduced by factor 16 (0.5^4)."""
-        design_vehicle = _make_vehicle("Design", 30.0, [_single_axle(200.0)])
-        light_vehicle = _make_vehicle("Light", 15.0, [_single_axle(100.0)])
+        design_vehicle = _make_vehicle("Design", 30.0, [make_single_axle(200.0)])
+        light_vehicle = _make_vehicle("Light", 15.0, [make_single_axle(100.0)])
 
         t_design = _make_traffic([FleetUnit(vehicle=design_vehicle, trips_per_day=10)])
         t_mixed = _make_traffic(
@@ -388,13 +382,13 @@ class TestComputeCoverages:
         )
 
     def test_confidence_is_benchmark_tested(self) -> None:
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(100.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=10)])
         result = compute_coverages(traffic)
         assert result.confidence == "benchmark_tested"
 
     def test_positive_coverages(self) -> None:
-        vehicle = _make_vehicle("V1", 30.0, [_single_axle(100.0)])
+        vehicle = _make_vehicle("V1", 30.0, [make_single_axle(100.0)])
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=5)])
         result = compute_coverages(traffic)
         assert result.total_coverages > 0
