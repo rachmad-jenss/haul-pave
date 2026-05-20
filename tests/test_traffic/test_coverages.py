@@ -150,7 +150,7 @@ class TestDesignWheelLoad:
 
     def test_picks_max_across_axle_groups(self) -> None:
         """Front axle load (77.5) > rear tandem load (47.5): design = 77.5."""
-        vehicle = _make_vehicle("V1", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])
+        vehicle = _make_vehicle("V1", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])  # noqa: E501
         traffic = _make_traffic([FleetUnit(vehicle=vehicle, trips_per_day=50)])
         assert math.isclose(_design_wheel_load_kn(traffic), 77.5, rel_tol=1e-9)
 
@@ -168,8 +168,8 @@ class TestDesignWheelLoad:
 
     def test_fleet_a_design_wheel_load(self) -> None:
         """Fleet A: 77.5 kN (CAT 777G front axle ÷ 2)."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])
+        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])  # noqa: E501
+        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),
@@ -258,8 +258,8 @@ class TestComputeCoverages:
 
     def test_fleet_a_total_coverages(self) -> None:
         """Fleet A hand-calc: 771,523.33 coverages (±2%)."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])
+        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])  # noqa: E501
+        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),
@@ -276,7 +276,7 @@ class TestComputeCoverages:
 
     def test_fleet_b_total_coverages(self) -> None:
         """Fleet B hand-calc: 530,357.24 coverages (±2%)."""
-        cat_785d = _make_vehicle("CAT 785D", 269.0, [make_single_axle(225.0), make_tandem_axle(1040.0)])
+        cat_785d = _make_vehicle("CAT 785D", 269.0, [make_single_axle(225.0), make_tandem_axle(1040.0)])  # noqa: E501
         motor_grader = _make_vehicle(
             "Motor Grader", 25.0, [make_single_axle(85.0), make_tandem_axle(160.0)]
         )
@@ -296,8 +296,8 @@ class TestComputeCoverages:
 
     def test_fleet_c_total_coverages(self) -> None:
         """Fleet C hand-calc: 268,531.80 coverages (±2%)."""
-        cat_793f = _make_vehicle("CAT 793F", 623.0, [make_single_axle(550.0), make_tandem_axle(1900.0)])
-        fuel_truck = _make_vehicle("Fuel Truck", 30.0, [make_single_axle(100.0), make_tandem_axle(200.0)])
+        cat_793f = _make_vehicle("CAT 793F", 623.0, [make_single_axle(550.0), make_tandem_axle(1900.0)])  # noqa: E501
+        fuel_truck = _make_vehicle("Fuel Truck", 30.0, [make_single_axle(100.0), make_tandem_axle(200.0)])  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_793f, trips_per_day=30),
@@ -314,8 +314,8 @@ class TestComputeCoverages:
 
     def test_design_wheel_load_fleet_a(self) -> None:
         """Fleet A design wheel load: 77.5 kN."""
-        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])
-        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])
+        cat_777g = _make_vehicle("CAT 777G", 186.0, [make_single_axle(155.0), make_tandem_axle(760.0)])  # noqa: E501
+        water_truck = _make_vehicle("Water Truck", 40.0, [make_single_axle(120.0), make_tandem_axle(270.0)])  # noqa: E501
         traffic = _make_traffic(
             [
                 FleetUnit(vehicle=cat_777g, trips_per_day=50),

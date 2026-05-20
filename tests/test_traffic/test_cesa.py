@@ -7,17 +7,15 @@ import math
 import pytest
 
 from haulpave.models.traffic import FleetUnit, TrafficInput
-
 from haulpave.traffic.cesa import CesaResult, _lef_for_axle_group, compute_cesa
 
 from ..conftest import (
     make_single_axle,
     make_tandem_axle,
+    make_traffic,
     make_tridem_axle,
     make_vehicle,
-    make_traffic,
 )
-
 
 # ---------------------------------------------------------------------------
 # Tests: _lef_for_axle_group
@@ -253,7 +251,10 @@ class TestMultiAxleVehicle:
 
     def test_three_axle_groups(self) -> None:
         """A vehicle with three axle groups must compute a positive CESA."""
-        v = make_vehicle("Triple", [make_single_axle(80.0), make_tandem_axle(160.0), make_tridem_axle(240.0)])
+        v = make_vehicle(
+            "Triple",
+            [make_single_axle(80.0), make_tandem_axle(160.0), make_tridem_axle(240.0)],
+        )
         result = compute_cesa(make_traffic(v, trips=1, life_years=1, days_per_year=1))
         # LEF: 1.0 + 2.0 + 3.0 = 6.0; CESA = 1 × 6.0 × 1 × 1 = 6.0
         assert math.isclose(result.total_cesa, 6.0, rel_tol=1e-9)

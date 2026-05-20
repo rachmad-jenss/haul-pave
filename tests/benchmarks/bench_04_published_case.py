@@ -92,7 +92,7 @@ SUBGRADE_CBR = CASE["subgrade_cbr"]  # 7
 from haulpave.models.traffic import FleetUnit, TrafficInput  # noqa: E402
 from haulpave.models.vehicle import MiningVehicle  # noqa: E402
 
-from ..conftest import make_single_axle, make_tandem_axle
+from ..conftest import make_single_axle, make_tandem_axle  # noqa: E402
 
 
 @pytest.fixture()
