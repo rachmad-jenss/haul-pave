@@ -96,7 +96,9 @@ def analyze_sensitivity(
         for pct in [-range_pct, -range_pct / 2, 0, range_pct / 2, range_pct]:
             perturbed = baseline_val * (1 + pct / 100)
             clamped = max(cbr_min, min(cbr_max, perturbed))
-            thickness, _was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=clamped, coverages=base_cov)
+            thickness, _was_clamped, _was_extrapolated = interpolate_thickness(
+                curve_data, cbr=clamped, coverages=base_cov
+            )
             perturbations.append((clamped, thickness))
 
         return SensitivityResult(variable="cbr", baseline=baseline_val, perturbations=perturbations)
@@ -111,7 +113,9 @@ def analyze_sensitivity(
         for pct in [-range_pct, -range_pct / 2, 0, range_pct / 2, range_pct]:
             perturbed = baseline_val * (1 + pct / 100)
             clamped = max(cov_min, min(cov_max, perturbed))
-            thickness, _was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=subgrade_cbr, coverages=clamped)
+            thickness, _was_clamped, _was_extrapolated = interpolate_thickness(
+                curve_data, cbr=subgrade_cbr, coverages=clamped
+            )
             perturbations.append((clamped, thickness))
 
         return SensitivityResult(
