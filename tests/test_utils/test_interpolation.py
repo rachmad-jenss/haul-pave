@@ -165,8 +165,10 @@ class TestInterpolateThickness:
     def test_coverages_below_min_clamps_to_min_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """Coverages below curve minimum are clamped to minimum coverage level (10)."""
         with pytest.warns(UserWarning, match="below curve minimum"):
-            result_clamped, was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=1)
-        result_min, _was_clamped_min, _ = interpolate_thickness(curve_data, cbr=10, coverages=10)
+            result_clamped, was_clamped, _extrap = interpolate_thickness(
+                curve_data, cbr=10, coverages=1
+            )
+        result_min, _c_min, _ = interpolate_thickness(curve_data, cbr=10, coverages=10)
         assert was_clamped, "Expected was_clamped=True when coverages below minimum"
         assert result_clamped == result_min, (
             f"Expected coverages=1 to clamp to coverages=10: "
@@ -176,10 +178,12 @@ class TestInterpolateThickness:
     def test_coverages_above_max_clamps_to_max_level(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """Coverages above curve maximum (1M) are clamped to the maximum."""
         with pytest.warns(UserWarning, match="exceed curve maximum"):
-            result_clamped, was_clamped, _was_extrapolated = interpolate_thickness(
+            result_clamped, was_clamped, _extrap = interpolate_thickness(
                 curve_data, cbr=10, coverages=10_000_000
             )
-        result_max, _was_clamped_max, _ = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
+        result_max, _c_max, _ = interpolate_thickness(
+            curve_data, cbr=10, coverages=1_000_000
+        )
         assert was_clamped, "Expected was_clamped=True when coverages exceed maximum"
         assert result_clamped == result_max, (
             f"Expected coverages=10_000_000 to clamp to coverages=1_000_000: "
@@ -196,27 +200,37 @@ class TestInterpolateThickness:
 
     def test_was_clamped_false_in_range(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_clamped is False when coverages are within curve range."""
-        _result, was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=1000)
+        _result, was_clamped, _extrap = interpolate_thickness(
+            curve_data, cbr=10, coverages=1000
+        )
         assert not was_clamped
 
     def test_was_clamped_true_below_min(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_clamped is True when coverages are below curve minimum."""
         with pytest.warns(UserWarning):
-            _result, was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=1)
+            _result, was_clamped, _extrap = interpolate_thickness(
+                curve_data, cbr=10, coverages=1
+            )
         assert was_clamped
 
     def test_was_clamped_true_above_max(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_clamped is True when coverages exceed curve maximum (1M)."""
         with pytest.warns(UserWarning):
-            _result, was_clamped, _was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=10_000_000)
+            _result, was_clamped, _extrap = interpolate_thickness(
+                curve_data, cbr=10, coverages=10_000_000
+            )
         assert was_clamped
 
     def test_was_extrapolated_true_for_extrapolated_zone(self, curve_data: dict) -> None:  # type: ignore[type-arg]
-        """was_extrapolated is True for coverages beyond digitized range (100K) but within max (1M)."""
-        _result, _was_clamped, was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=500_000)
+        """was_extrapolated is True for coverages beyond 100K but within 1M."""
+        _result, _clamped, was_extrapolated = interpolate_thickness(
+            curve_data, cbr=10, coverages=500_000
+        )
         assert was_extrapolated
 
     def test_was_extrapolated_false_for_digitized_range(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_extrapolated is False for coverages within digitized range (<= 100K)."""
-        _result, _was_clamped, was_extrapolated = interpolate_thickness(curve_data, cbr=10, coverages=100_000)
+        _result, _clamped, was_extrapolated = interpolate_thickness(
+            curve_data, cbr=10, coverages=100_000
+        )
         assert not was_extrapolated
