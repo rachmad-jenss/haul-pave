@@ -341,9 +341,7 @@ class TestDesignPavement:
             CustomMaterial(
                 name="Wearing course", material_type="asphalt", elastic_modulus_mpa=3000.0
             ),
-            CustomMaterial(
-                name="Base", material_type="granular", elastic_modulus_mpa=250.0
-            ),
+            CustomMaterial(name="Base", material_type="granular", elastic_modulus_mpa=250.0),
         ]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)

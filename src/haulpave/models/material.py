@@ -102,13 +102,9 @@ class CustomMaterial:
     def __post_init__(self) -> None:
         """Validate custom material properties."""
         if self.elastic_modulus_mpa <= 0:
-            raise ValueError(
-                f"elastic_modulus_mpa must be > 0, got {self.elastic_modulus_mpa}"
-            )
+            raise ValueError(f"elastic_modulus_mpa must be > 0, got {self.elastic_modulus_mpa}")
         if not (0 < self.poisson_ratio < 0.5):
-            raise ValueError(
-                f"poisson_ratio must be in (0, 0.5), got {self.poisson_ratio}"
-            )
+            raise ValueError(f"poisson_ratio must be in (0, 0.5), got {self.poisson_ratio}")
 
 
 def material_to_layer_coefficient(material: CustomMaterial) -> float:
