@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from haulpave.pavement.trh14 import TRH14Result
 
+from haulpave.models.material import CustomMaterial
 from haulpave.models.traffic import TrafficInput
 from haulpave.traffic.cesa import compute_cesa
 from haulpave.traffic.coverages import compute_coverages
@@ -90,6 +91,7 @@ def design_pavement(
     traffic: TrafficInput,
     subgrade_cbr: float,
     curve_id: str = "usace_cbr_v1",
+    custom_materials: list[CustomMaterial] | None = None,
 ) -> PavementResult:
     """Design pavement thickness using the USACE TM 5-822-12 CBR method.
 
@@ -110,6 +112,11 @@ def design_pavement(
     curve_id:
         Digitized curve dataset identifier, e.g. ``"usace_cbr_v1"``.
         Loads ``<curve_id>.json`` from ``src/haulpave/design/curves/``.
+    custom_materials:
+        Optional list of ``CustomMaterial`` instances.  When provided, the
+        ``layers`` field of the result is populated with serialised material
+        info.  Materials are validated (``elastic_modulus_mpa`` > 0,
+        ``poisson_ratio`` in (0, 0.5)) before computation proceeds.
 
     Returns
     -------
@@ -135,6 +142,22 @@ def design_pavement(
         coverages=cov_result.total_coverages,
     )
     confidence: Literal["high", "medium", "low"] = "medium" if was_extrapolated else "high"
+
+    layers: tuple[dict[str, Any], ...] = ()
+    if custom_materials is not None:
+        layers = tuple(
+            {
+                "name": m.name,
+                "material_type": m.material_type,
+                "elastic_modulus_mpa": m.elastic_modulus_mpa,
+                "cbr_percent": m.cbr_percent,
+                "poisson_ratio": m.poisson_ratio,
+                "layer_coefficient": m.layer_coefficient,
+                "thickness_mm": m.thickness_mm,
+            }
+            for m in custom_materials
+        )
+
     return PavementResult(
         total_cesa=cesa_result.total_cesa,
         total_coverages=cov_result.total_coverages,
@@ -145,6 +168,7 @@ def design_pavement(
         was_clamped=was_clamped,
         was_extrapolated=was_extrapolated,
         confidence=confidence,
+        layers=layers,
     )
 
 
@@ -158,6 +182,7 @@ def cbr_thickness_from_coverages(
     subgrade_cbr: float,
     design_coverages: float,
     curve_id: str = "usace_cbr_v1",
+    custom_materials: list[CustomMaterial] | None = None,
 ) -> float:
     """Return required CBR pavement thickness from pre-computed design coverages.
 
@@ -174,6 +199,10 @@ def cbr_thickness_from_coverages(
         Pre-computed design coverages (equivalent wheel passes).  Must be > 0.
     curve_id:
         Digitized curve dataset identifier (default ``"usace_cbr_v1"``).
+    custom_materials:
+        Optional list of ``CustomMaterial`` instances.  When provided,
+        materials are validated before computation.  The total thickness
+        is still determined by the USACE CBR curve.
 
     Returns
     -------
@@ -190,6 +219,7 @@ def cbr_thickness_from_coverages(
 def trh14_thickness_from_coverages(
     subgrade_cbr: float,
     design_coverages: float,
+    custom_materials: list[CustomMaterial] | None = None,
 ) -> TRH14Result:
     """Return TRH 14 pavement thickness from subgrade CBR and pre-computed coverages.
 
@@ -202,6 +232,10 @@ def trh14_thickness_from_coverages(
         Subgrade CBR [%].  Must be ≥ 0.
     design_coverages:
         Pre-computed design coverages.  Must be > 0.
+    custom_materials:
+        Optional list of ``CustomMaterial`` instances.  When provided,
+        materials are validated and their structural numbers are included
+        in the result metadata.
 
     Returns
     -------

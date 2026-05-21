@@ -26,6 +26,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
+from haulpave.models.material import CustomMaterial
 from haulpave.models.traffic import TrafficInput
 from haulpave.pavement.trh14 import TRH14Result, compute_trh14
 
@@ -74,6 +75,7 @@ def compare_methods(
     traffic: TrafficInput,
     subgrade_cbr: float,
     curve_id: str = _DEFAULT_CURVE_ID,
+    custom_materials: list[CustomMaterial] | None = None,
 ) -> ComparisonResult:
     """Compare USACE TM 5-822-12 CBR and TRH 14 pavement design results.
 
@@ -90,6 +92,9 @@ def compare_methods(
     curve_id:
         USACE CBR curve dataset identifier, e.g. ``"usace_cbr_v1"``.
         Defaults to ``"usace_cbr_v1"``.
+    custom_materials:
+        Optional list of ``CustomMaterial`` instances.  Passed through to
+        both sub-engines.
 
     Returns
     -------
@@ -104,8 +109,8 @@ def compare_methods(
     """
     from haulpave.pavement import design_pavement
 
-    usace_result = design_pavement(traffic, subgrade_cbr, curve_id)
-    trh14_result = compute_trh14(traffic, subgrade_cbr)
+    usace_result = design_pavement(traffic, subgrade_cbr, curve_id, custom_materials)
+    trh14_result = compute_trh14(traffic, subgrade_cbr, custom_materials)
     delta = trh14_result.total_thickness_mm - usace_result.required_thickness_mm
 
     return ComparisonResult(

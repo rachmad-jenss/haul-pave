@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pytest
 
+from haulpave.models.material import CustomMaterial
 from haulpave.pavement import cbr_thickness_from_coverages, trh14_thickness_from_coverages
 
 
@@ -78,3 +79,38 @@ class TestTrh14ThicknessFromCoverages:
     def test_g1_subgrade(self) -> None:
         result = trh14_thickness_from_coverages(subgrade_cbr=80.0, design_coverages=1_000)
         assert result.material_class == "G1"
+
+
+class TestCbrThicknessWithCustomMaterials:
+    def test_custom_materials_accepted(self) -> None:
+        materials = [
+            CustomMaterial(name="Crusher run", material_type="granular", elastic_modulus_mpa=250.0),
+            CustomMaterial(name="Asphalt", material_type="asphalt", elastic_modulus_mpa=3000.0),
+        ]
+        t = cbr_thickness_from_coverages(
+            subgrade_cbr=8.0, design_coverages=10_000, custom_materials=materials
+        )
+        assert t > 0
+
+    def test_single_custom_material(self) -> None:
+        mat = CustomMaterial(name="Geocell base", material_type="stabilized", elastic_modulus_mpa=400.0)
+        t = cbr_thickness_from_coverages(
+            subgrade_cbr=5.0, design_coverages=50_000, custom_materials=[mat]
+        )
+        assert t > 0
+
+    def test_invalid_material_raises(self) -> None:
+        with pytest.raises(ValueError, match="elastic_modulus_mpa"):
+            CustomMaterial(name="Bad", material_type="granular", elastic_modulus_mpa=-1)
+
+
+class TestTrh14ThicknessWithCustomMaterials:
+    def test_custom_materials_accepted(self) -> None:
+        materials = [
+            CustomMaterial(name="Crushed rock", material_type="granular", elastic_modulus_mpa=300.0),
+        ]
+        result = trh14_thickness_from_coverages(
+            subgrade_cbr=10.0, design_coverages=10_000, custom_materials=materials
+        )
+        assert result.material_class == "G5"
+        assert result.total_thickness_mm > 0

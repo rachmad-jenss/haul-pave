@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 
+from haulpave.models.material import CustomMaterial
 from haulpave.models.traffic import FleetUnit, TrafficInput
 from haulpave.models.vehicle import MiningVehicle
 from haulpave.pavement import PavementResult, design_pavement
@@ -325,3 +326,44 @@ class TestDesignPavement:
         assert result.design_wheel_load_kn == pytest.approx(
             cov_direct.design_wheel_load_kn, rel=1e-9
         )
+
+    def test_custom_materials_populate_layers(self, simple_traffic: TrafficInput) -> None:
+        """Custom materials appear as entries in the layers field."""
+        import warnings
+
+        materials = [
+            CustomMaterial(name="Wearing course", material_type="asphalt", elastic_modulus_mpa=3000.0),
+            CustomMaterial(name="Base", material_type="granular", elastic_modulus_mpa=250.0),
+        ]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=simple_traffic,
+                subgrade_cbr=5.0,
+                curve_id="usace_cbr_v1",
+                custom_materials=materials,
+            )
+        assert len(result.layers) == 2
+        assert result.layers[0]["name"] == "Wearing course"
+        assert result.layers[1]["name"] == "Base"
+
+    def test_custom_materials_hybrid_with_default(self, simple_traffic: TrafficInput) -> None:
+        """Design with custom materials still returns valid thickness."""
+        import warnings
+
+        mat = CustomMaterial(
+            name="Cemented layer",
+            material_type="stabilized",
+            elastic_modulus_mpa=500.0,
+            cbr_percent=60.0,
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            result = design_pavement(
+                traffic=simple_traffic,
+                subgrade_cbr=10.0,
+                curve_id="usace_cbr_v1",
+                custom_materials=[mat],
+            )
+        assert result.required_thickness_mm > 0
+        assert len(result.layers) == 1
