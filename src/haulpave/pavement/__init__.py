@@ -63,10 +63,14 @@ class PavementResult:
     was_clamped:
         True if design coverages exceeded the curve range and were clamped
         to the nearest boundary.
+    was_extrapolated:
+        True if design coverages are within the curve range but beyond the
+        original digitized range — the result is an extrapolation.
     method:
         Human-readable method identifier.
     confidence:
         Confidence label following the project plan §4.3 convention.
+        Set to ``"medium"`` when ``was_extrapolated`` is True.
     """
 
     total_cesa: float
@@ -77,6 +81,7 @@ class PavementResult:
     subgrade_cbr: float = 0.0
     layers: tuple[dict[str, Any], ...] = ()
     was_clamped: bool = False
+    was_extrapolated: bool = False
     method: str = "USACE TM 5-822-12 CBR design curves + AASHTO 4th-power LEF"
     confidence: Literal["high", "medium", "low"] = "high"
 
@@ -116,15 +121,20 @@ def design_pavement(
     Coverage values that exceed the curve's tabulated range are
     clamped to the curve boundary.  ``result.was_clamped`` is ``True``
     when clamping occurs.
+
+    Coverage values beyond the original digitized range (100 000) but
+    within the extended range (up to 1 000 000) return ``was_extrapolated``
+    = ``True`` and ``confidence`` = ``"medium"``.
     """
     cesa_result = compute_cesa(traffic)
     cov_result = compute_coverages(traffic)
     curve_data = load_curve_data(curve_id)
-    thickness, was_clamped = interpolate_thickness(
+    thickness, was_clamped, was_extrapolated = interpolate_thickness(
         curve_data,
         cbr=subgrade_cbr,
         coverages=cov_result.total_coverages,
     )
+    confidence: Literal["high", "medium", "low"] = "medium" if was_extrapolated else "high"
     return PavementResult(
         total_cesa=cesa_result.total_cesa,
         total_coverages=cov_result.total_coverages,
@@ -133,6 +143,8 @@ def design_pavement(
         design_wheel_load_kn=cov_result.design_wheel_load_kn,
         subgrade_cbr=subgrade_cbr,
         was_clamped=was_clamped,
+        was_extrapolated=was_extrapolated,
+        confidence=confidence,
     )
 
 
@@ -168,10 +180,19 @@ def cbr_thickness_from_coverages(
     float
         Required total pavement thickness [mm].
     """
+    import warnings
+
     curve_data = load_curve_data(curve_id)
-    thickness, _was_clamped = interpolate_thickness(
+    thickness, _was_clamped, _was_extrapolated = interpolate_thickness(
         curve_data, cbr=subgrade_cbr, coverages=design_coverages
     )
+    if _was_extrapolated:
+        warnings.warn(
+            "Result is based on extrapolated curve data beyond the digitised range "
+            "(> 100 000 coverages). Confidence is medium.",
+            UserWarning,
+            stacklevel=2,
+        )
     return thickness
 
 

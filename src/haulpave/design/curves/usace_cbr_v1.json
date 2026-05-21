@@ -1,11 +1,12 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "curve_id": "usace_cbr_v1",
-  "description": "USACE TM 5-822-12 Figure 1 — CBR design curves for flexible pavement (aggregate-surfaced). Required total pavement thickness (mm) vs subgrade CBR for given design coverages.",
+  "description": "USACE TM 5-822-12 Figure 1 — CBR design curves for flexible pavement (aggregate-surfaced). Required total pavement thickness (mm) vs subgrade CBR for given design coverages. Coverage levels beyond 100,000 are log-linear extrapolations of the digitized curve and are marked as extrapolated.",
   "x_axis": "cbr_percent",
   "y_axis": "required_thickness_mm",
   "parameter": "design_coverages",
-  "coverage_levels": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
+  "coverage_levels": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 200000, 500000, 1000000],
+  "extrapolated_coverage_levels": [200000, 500000, 1000000],
   "cbr_values": [2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50, 80, 100],
   "thickness_mm": {
     "10":     [560, 480, 435, 400, 375, 335, 305, 260, 230, 195, 175, 160, 130, 120],
@@ -16,6 +17,9 @@
     "5000":   [760, 665, 610, 562, 530, 478, 440, 379, 337, 288, 260, 237, 196, 183],
     "10000":  [780, 683, 628, 579, 547, 494, 456, 393, 349, 299, 270, 247, 204, 190],
     "50000":  [820, 720, 663, 612, 578, 524, 484, 419, 373, 320, 290, 265, 219, 205],
-    "100000": [840, 738, 680, 629, 594, 539, 499, 432, 386, 331, 300, 275, 228, 213]
+    "100000": [840, 738, 680, 629, 594, 539, 499, 432, 386, 331, 300, 275, 228, 213],
+    "200000": [859, 755, 697, 645, 609, 553, 513, 444, 397, 341, 309, 283, 235, 219],
+    "500000": [883, 778, 719, 665, 629, 572, 530, 460, 412, 354, 321, 294, 244, 228],
+    "1000000":[902, 795, 735, 681, 644, 586, 544, 472, 423, 363, 330, 303, 252, 235]
   }
 }

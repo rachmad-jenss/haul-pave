@@ -55,11 +55,17 @@ def _validate_curve_data(curve_data: dict[str, Any]) -> None:
             )
 
 
+def _get_extrapolated_levels(curve_data: dict[str, Any]) -> set[float]:
+    """Return the set of extrapolated coverage levels from the curve data."""
+    raw = curve_data.get("extrapolated_coverage_levels", [])
+    return {float(v) for v in raw}
+
+
 def interpolate_thickness(
     curve_data: dict[str, Any],
     cbr: float,
     coverages: float,
-) -> tuple[float, bool]:
+) -> tuple[float, bool, bool]:
     """Interpolate required pavement thickness for given CBR and design coverages.
 
     Uses 2-step PCHIP interpolation:
@@ -76,8 +82,10 @@ def interpolate_thickness(
             the curve's coverage range are clamped to the boundary.
 
     Returns:
-        Tuple of (required total pavement thickness [mm], was_clamped).
-        ``was_clamped`` is True when coverages were outside the curve range.
+        Tuple of (required total pavement thickness [mm], was_clamped,
+        was_extrapolated). ``was_extrapolated`` is True when coverages are
+        within the extended range but lie beyond the original (digitized)
+        curve data — i.e. the result is an extrapolation.
 
     Raises:
         ValueError: If CBR is outside the supported range, coverages <= 0,
@@ -93,7 +101,16 @@ def interpolate_thickness(
     if coverages <= 0:
         raise ValueError(f"coverages must be > 0, got {coverages}")
 
+    # Determine the digitized (original) coverage max
+    extrapolated_set = _get_extrapolated_levels(curve_data)
+    if extrapolated_set:
+        digitized_levels = [v for v in coverage_levels if v not in extrapolated_set]
+    else:
+        digitized_levels = list(coverage_levels)
+    digitized_max = max(digitized_levels) if digitized_levels else coverage_levels[-1]
+
     was_clamped = False
+    was_extrapolated = False
     if coverages < coverage_levels[0]:
         warnings.warn(
             f"USACE CBR: design coverages ({coverages:.0f}) below curve minimum "
@@ -110,7 +127,17 @@ def interpolate_thickness(
             stacklevel=2,
         )
         was_clamped = True
-    log_cov = np.log10(np.clip(coverages, coverage_levels[0], coverage_levels[-1]))
+    elif coverages > digitized_max:
+        warnings.warn(
+            f"USACE CBR: design coverages ({coverages:.0f}) are in the extrapolated zone "
+            f"(beyond {digitized_max:.0f}). Result carries medium confidence.",
+            UserWarning,
+            stacklevel=2,
+        )
+        was_extrapolated = True
+
+    cov_clamped = float(np.clip(coverages, coverage_levels[0], coverage_levels[-1]))
+    log_cov = np.log10(cov_clamped)
     log_cov_levels = np.log10(coverage_levels)
 
     # For each coverage level, interpolate thickness at the requested CBR
@@ -122,4 +149,4 @@ def interpolate_thickness(
 
     # Interpolate across coverage levels (log scale)
     cov_pchip = PchipInterpolator(log_cov_levels, thicknesses_at_coverages)
-    return float(cov_pchip(log_cov)), was_clamped
+    return float(cov_pchip(log_cov)), was_clamped, was_extrapolated
