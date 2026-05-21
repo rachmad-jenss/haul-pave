@@ -128,6 +128,12 @@ def interpolate_thickness(
         )
         was_clamped = True
     elif coverages > digitized_max:
+        warnings.warn(
+            f"USACE CBR: design coverages ({coverages:.0f}) are in the extrapolated zone "
+            f"(beyond {digitized_max:.0f}). Result carries medium confidence.",
+            UserWarning,
+            stacklevel=2,
+        )
         was_extrapolated = True
 
     cov_clamped = float(np.clip(coverages, coverage_levels[0], coverage_levels[-1]))

@@ -275,11 +275,11 @@ class TestDesignPavement:
         )
 
     def test_bench04_thickness(self, fleet_b_traffic: TrafficInput) -> None:
-        """Fleet B thickness must be greater than the old clamped value.
+        """Fleet B thickness matches extrapolated expected value within 5 mm.
 
         Fleet B coverages (530,357) are now in the extrapolated zone (beyond
-        100K) rather than clamped. The extrapolated thickness should be greater
-        than the 100K-clamped value (564.49 mm).
+        100K) rather than clamped. The extrapolated thickness at CBR=7,
+        530K coverages is ~599.73 mm.
         """
         import warnings
 
@@ -290,7 +290,13 @@ class TestDesignPavement:
                 subgrade_cbr=7.0,
                 curve_id="usace_cbr_v1",
             )
-        assert result.required_thickness_mm > 564.49
+        expected = 599.73
+        abs_error = abs(result.required_thickness_mm - expected)
+        assert abs_error <= 5.0, (
+            f"Thickness: computed={result.required_thickness_mm:.2f} mm, "
+            f"expected={expected:.2f} mm, "
+            f"absolute error={abs_error:.2f} mm (tolerance=5 mm)"
+        )
 
     def test_cesa_consistent_with_traffic_module(self, fleet_b_traffic: TrafficInput) -> None:
         """design_pavement CESA must match compute_cesa() called independently."""
