@@ -180,10 +180,19 @@ def cbr_thickness_from_coverages(
     float
         Required total pavement thickness [mm].
     """
+    import warnings
+
     curve_data = load_curve_data(curve_id)
     thickness, _was_clamped, _was_extrapolated = interpolate_thickness(
         curve_data, cbr=subgrade_cbr, coverages=design_coverages
     )
+    if _was_extrapolated:
+        warnings.warn(
+            "Result is based on extrapolated curve data beyond the digitised range "
+            "(> 100 000 coverages). Confidence is medium.",
+            UserWarning,
+            stacklevel=2,
+        )
     return thickness
 
 
