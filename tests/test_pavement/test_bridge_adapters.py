@@ -93,7 +93,9 @@ class TestCbrThicknessWithCustomMaterials:
         assert t > 0
 
     def test_single_custom_material(self) -> None:
-        mat = CustomMaterial(name="Geocell base", material_type="stabilized", elastic_modulus_mpa=400.0)
+        mat = CustomMaterial(
+            name="Geocell base", material_type="stabilized", elastic_modulus_mpa=400.0
+        )
         t = cbr_thickness_from_coverages(
             subgrade_cbr=5.0, design_coverages=50_000, custom_materials=[mat]
         )
@@ -107,7 +109,9 @@ class TestCbrThicknessWithCustomMaterials:
 class TestTrh14ThicknessWithCustomMaterials:
     def test_custom_materials_accepted(self) -> None:
         materials = [
-            CustomMaterial(name="Crushed rock", material_type="granular", elastic_modulus_mpa=300.0),
+            CustomMaterial(
+                name="Crushed rock", material_type="granular", elastic_modulus_mpa=300.0
+            ),
         ]
         result = trh14_thickness_from_coverages(
             subgrade_cbr=10.0, design_coverages=10_000, custom_materials=materials
