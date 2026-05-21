@@ -32,6 +32,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
+from haulpave.models.material import CustomMaterial
 from haulpave.models.traffic import TrafficInput
 from haulpave.traffic.coverages import compute_coverages
 
@@ -204,7 +205,11 @@ class TRH14Result:
     confidence: Literal["high", "medium", "low"] = "high"
 
 
-def compute_trh14(traffic: TrafficInput, subgrade_cbr: float) -> TRH14Result:
+def compute_trh14(
+    traffic: TrafficInput,
+    subgrade_cbr: float,
+    custom_materials: list[CustomMaterial] | None = None,
+) -> TRH14Result:
     """Design pavement thickness using the TRH 14 (CSRA 1985) method.
 
     Pipeline:
@@ -219,6 +224,9 @@ def compute_trh14(traffic: TrafficInput, subgrade_cbr: float) -> TRH14Result:
         ``TrafficInput`` containing fleet mix, design life, and working days.
     subgrade_cbr:
         Subgrade CBR value [%].  Must be ≥ 0.
+    custom_materials:
+        Optional list of ``CustomMaterial`` instances.  When provided,
+        materials are validated before computation proceeds.
 
     Returns
     -------

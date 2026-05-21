@@ -9,7 +9,7 @@ All models use SI units internally:
 """
 
 from haulpave.models.economics import CostAssumptions, CostScenario, EconomicResult
-from haulpave.models.material import MaterialLayer
+from haulpave.models.material import CustomMaterial, MaterialLayer, material_to_layer_coefficient
 from haulpave.models.pavement import DesignResult, PavementStructure, SubgradeInfo
 from haulpave.models.traffic import FleetUnit, HaulSegment, TrafficInput, TrafficResult
 from haulpave.models.vehicle import AxleGroup, MiningVehicle, TireSpec
@@ -25,7 +25,9 @@ __all__ = [
     "TrafficInput",
     "TrafficResult",
     # material
+    "CustomMaterial",
     "MaterialLayer",
+    "material_to_layer_coefficient",
     # pavement
     "SubgradeInfo",
     "PavementStructure",
