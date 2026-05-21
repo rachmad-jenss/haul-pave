@@ -243,8 +243,8 @@ def trh14_thickness_from_coverages(
         Pre-computed design coverages.  Must be > 0.
     custom_materials:
         Optional list of ``CustomMaterial`` instances.  When provided,
-        materials are validated and their structural numbers are included
-        in the result metadata.
+        materials are validated before computation (hooks for future
+        layer-specific TRH 14 design).
 
     Returns
     -------

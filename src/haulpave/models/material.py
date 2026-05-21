@@ -142,16 +142,20 @@ def material_to_layer_coefficient(material: CustomMaterial) -> float:
         return 0.23
 
     # Granular: empirical correlation from CBR
-    cbr = material.cbr_percent
-    if cbr is not None and cbr >= 80:
+    if material.cbr_percent is None:
+        raise ValueError(
+            f"cbr_percent is required for granular material '{material.name}'. "
+            "Set cbr_percent or provide an explicit layer_coefficient."
+        )
+    if material.cbr_percent >= 80:
         return 0.14
-    elif cbr is not None and cbr >= 50:
+    elif material.cbr_percent >= 50:
         return 0.13
-    elif cbr is not None and cbr >= 30:
+    elif material.cbr_percent >= 30:
         return 0.12
-    elif cbr is not None and cbr >= 15:
+    elif material.cbr_percent >= 15:
         return 0.11
-    elif cbr is not None and cbr >= 7:
+    elif material.cbr_percent >= 7:
         return 0.10
     else:
         return 0.08
