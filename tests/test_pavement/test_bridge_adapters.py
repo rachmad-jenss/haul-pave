@@ -35,6 +35,22 @@ class TestCbrThicknessFromCoverages:
         with pytest.raises(ValueError):
             cbr_thickness_from_coverages(subgrade_cbr=200.0, design_coverages=10_000)
 
+    def test_accepts_extrapolated_coverages(self) -> None:
+        """Coverages > 100K are accepted without clamping."""
+        t = cbr_thickness_from_coverages(subgrade_cbr=8.0, design_coverages=500_000)
+        assert t > 0
+
+    def test_extrapolated_thicker_than_digitized(self) -> None:
+        """Extrapolated thickness at 500K > thickness at 100K for same CBR."""
+        t_100k = cbr_thickness_from_coverages(subgrade_cbr=8.0, design_coverages=100_000)
+        t_500k = cbr_thickness_from_coverages(subgrade_cbr=8.0, design_coverages=500_000)
+        assert t_500k > t_100k
+
+    def test_coverages_up_to_1m_accepted(self) -> None:
+        """Coverages at the new curve max (1M) are accepted."""
+        t = cbr_thickness_from_coverages(subgrade_cbr=10.0, design_coverages=1_000_000)
+        assert t > 0
+
 
 class TestTrh14ThicknessFromCoverages:
     def test_returns_result_with_material_class(self) -> None:

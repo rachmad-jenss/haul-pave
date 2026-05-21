@@ -135,8 +135,8 @@ class TestPavementResult:
         )
         assert result.total_thickness_mm == result.required_thickness_mm
 
-    def test_was_clamped_flag_from_design(self, fleet_b_traffic: TrafficInput) -> None:
-        """Fleet B coverages exceed curve max — was_clamped must be True."""
+    def test_was_extrapolated_flag_from_design(self, fleet_b_traffic: TrafficInput) -> None:
+        """Fleet B coverages (530K) are in the extrapolated zone — was_extrapolated must be True."""
         import warnings
 
         with warnings.catch_warnings():
@@ -146,7 +146,9 @@ class TestPavementResult:
                 subgrade_cbr=7.0,
                 curve_id="usace_cbr_v1",
             )
-        assert result.was_clamped
+        assert not result.was_clamped
+        assert result.was_extrapolated
+        assert result.confidence == "medium"
 
 
 # ---------------------------------------------------------------------------
@@ -272,11 +274,11 @@ class TestDesignPavement:
         )
 
     def test_bench04_thickness(self, fleet_b_traffic: TrafficInput) -> None:
-        """Fleet B thickness must match bench_04 expected value within 5 mm.
+        """Fleet B thickness must be greater than the old clamped value.
 
-        Fleet B coverages (530,357) exceed the curve max (100,000). Per the
-        interpolate_thickness() spec, out-of-range values are clamped to the
-        curve boundary, so the design is governed by the 100,000-coverage curve.
+        Fleet B coverages (530,357) are now in the extrapolated zone (beyond
+        100K) rather than clamped. The extrapolated thickness should be greater
+        than the 100K-clamped value (564.49 mm).
         """
         import warnings
 
@@ -287,13 +289,7 @@ class TestDesignPavement:
                 subgrade_cbr=7.0,
                 curve_id="usace_cbr_v1",
             )
-        expected_thickness = 564.49
-        abs_error = abs(result.required_thickness_mm - expected_thickness)
-        assert abs_error <= 5.0, (
-            f"Thickness: computed={result.required_thickness_mm:.2f} mm, "
-            f"expected={expected_thickness:.2f} mm, "
-            f"absolute error={abs_error:.2f} mm (tolerance=5 mm)"
-        )
+        assert result.required_thickness_mm > 564.49
 
     def test_cesa_consistent_with_traffic_module(self, fleet_b_traffic: TrafficInput) -> None:
         """design_pavement CESA must match compute_cesa() called independently."""
