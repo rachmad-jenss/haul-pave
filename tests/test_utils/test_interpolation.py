@@ -181,9 +181,7 @@ class TestInterpolateThickness:
             result_clamped, was_clamped, _extrap = interpolate_thickness(
                 curve_data, cbr=10, coverages=10_000_000
             )
-        result_max, _c_max, _ = interpolate_thickness(
-            curve_data, cbr=10, coverages=1_000_000
-        )
+        result_max, _c_max, _ = interpolate_thickness(curve_data, cbr=10, coverages=1_000_000)
         assert was_clamped, "Expected was_clamped=True when coverages exceed maximum"
         assert result_clamped == result_max, (
             f"Expected coverages=10_000_000 to clamp to coverages=1_000_000: "
@@ -200,17 +198,13 @@ class TestInterpolateThickness:
 
     def test_was_clamped_false_in_range(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_clamped is False when coverages are within curve range."""
-        _result, was_clamped, _extrap = interpolate_thickness(
-            curve_data, cbr=10, coverages=1000
-        )
+        _result, was_clamped, _extrap = interpolate_thickness(curve_data, cbr=10, coverages=1000)
         assert not was_clamped
 
     def test_was_clamped_true_below_min(self, curve_data: dict) -> None:  # type: ignore[type-arg]
         """was_clamped is True when coverages are below curve minimum."""
         with pytest.warns(UserWarning):
-            _result, was_clamped, _extrap = interpolate_thickness(
-                curve_data, cbr=10, coverages=1
-            )
+            _result, was_clamped, _extrap = interpolate_thickness(curve_data, cbr=10, coverages=1)
         assert was_clamped
 
     def test_was_clamped_true_above_max(self, curve_data: dict) -> None:  # type: ignore[type-arg]
