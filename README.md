@@ -72,6 +72,18 @@ summary = build_design_summary(
     results={"thickness_mm": thickness_mm},
 )
 print(summary.package_version, summary.generated_at)
+
+# 6. Custom pavement materials
+from haulpave.models.material import CustomMaterial, material_to_layer_coefficient
+
+mat = CustomMaterial(
+    name="Crusher run base",
+    material_type="granular",
+    elastic_modulus_mpa=250.0,
+    cbr_percent=60.0,
+)
+coeff = material_to_layer_coefficient(mat)
+print(f"Layer coefficient: {coeff:.2f}")
 ```
 
 ## API Overview
@@ -81,6 +93,7 @@ print(summary.package_version, summary.generated_at)
 | `haulpave.vehicle_registry` | `list_all()`, `find_by_id(id)`, `VehicleEntry` |
 | `haulpave.traffic.cesa` | `compute_cesa(TrafficInput)` → `CesaResult` |
 | `haulpave.traffic.coverages` | `compute_coverages(TrafficInput)` → `CoveragesResult` |
+| `haulpave.models.material` | `CustomMaterial` (frozen dataclass), `material_to_layer_coefficient()` |
 | `haulpave.pavement` | `cbr_thickness_from_coverages()`, `trh14_thickness_from_coverages()`, `design_pavement()` |
 | `haulpave.economics` | `compute_economics()`, `compare_scenarios([RoadScenario])` → `ComparisonResult` |
 | `haulpave.economics.export` | `export_comparison_to_excel(ComparisonResult, path)` |
@@ -122,6 +135,7 @@ Four OEM mining trucks with GVW and 25/75 front/rear axle-load split (CAT Perfor
 | Phase 2 — TRH 14 + comparison | TRH 14 engine, USACE vs TRH 14 comparison | ✅ Done (v0.2.0) |
 | Phase 3 — Economics + registry | Vehicle registry, rolling-resistance cost model, design summary | ✅ Done (v0.3.0) |
 | Phase 4 — Docs + community | MkDocs site, case studies, sensitivity analysis, unit conversion, CLI commands | ✅ Done (v0.4.0) |
+| Phase 5 — CBR extrapolation + custom materials | USACE curve extended to 1M coverages, `CustomMaterial` dataclass | ✅ Done (v0.5.0) |
 
 ## Design Principles
 
