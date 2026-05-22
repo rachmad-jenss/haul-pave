@@ -7,6 +7,21 @@ HaulPave uses [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.5.0] — 2026-05-21
+
+### Added
+- **USACE CBR curve extrapolation**: Coverage levels up to 1,000,000 via log-linear extrapolation. `interpolate_thickness()` returns `was_extrapolated` flag; `design_pavement()` sets `confidence="medium"` in extrapolated zone (DAS-87)
+- **Custom pavement materials**: `CustomMaterial` frozen dataclass + `material_to_layer_coefficient()` for AASHTO structural number estimation. `custom_materials` parameter added to `design_pavement()`, `cbr_thickness_from_coverages()`, `trh14_thickness_from_coverages()`, `compute_trh14()`, `compare_methods()`. `PavementResult.layers` populated when custom materials provided (DAS-88)
+
+### Changed
+- `PavementResult` gains `was_extrapolated: bool` field
+- `interpolate_thickness()` return type extended to `tuple[float, bool, bool]` (thickness, was_clamped, was_extrapolated)
+- `cbr_thickness_from_coverages()` accepts coverages > 100,000 without clamping
+
+### Technical
+- 409 unit + benchmark tests, 92% coverage
+- All CI quality checks pass (ruff, mypy, pytest)
+
 ## [0.4.1] — 2026-05-20
 
 ### Added

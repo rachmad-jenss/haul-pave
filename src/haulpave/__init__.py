@@ -8,4 +8,4 @@ roads and estimating operating-cost impacts.
 Docs: https://github.com/rachmad-jenss/haul-pave
 """
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
