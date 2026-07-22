@@ -21,10 +21,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: powershell
+
 jobs:
   quality:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, haul-pave]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +46,7 @@ jobs:
 
   test:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, haul-pave]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -62,14 +66,16 @@ jobs:
       - name: Run tests with coverage
         id: run-tests
         continue-on-error: true
+        shell: bash
         run: |
           set -o pipefail
           python --version
-          pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long 2>&1 | tee /tmp/pytest_out.txt
+          pytest --cov=haulpave --cov-report=term-missing --cov-fail-under=85 tests/ -v --tb=long 2>&1 | tee "${RUNNER_TEMP}/pytest_out.txt"
       - name: Post failure details to PR
         if: steps.run-tests.outcome == 'failure' && github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           {
             echo "**CI Test Failure — Python ${{ matrix.python-version }}**"
@@ -81,23 +87,24 @@ jobs:
             echo ""
             echo "Test output (last 100 lines):"
             echo '```'
-            tail -n 100 /tmp/pytest_out.txt 2>/dev/null || echo "(no output captured)"
+            tail -n 100 "${RUNNER_TEMP}/pytest_out.txt" 2>/dev/null || echo "(no output captured)"
             echo '```'
-          } > /tmp/ci_comment.md
+          } > "${RUNNER_TEMP}/ci_comment.md"
           gh pr comment ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
-            --body-file /tmp/ci_comment.md
+            --body-file "${RUNNER_TEMP}/ci_comment.md"
       - name: Fail if tests failed
         if: steps.run-tests.outcome == 'failure'
         run: exit 1
       - name: Run benchmark tests
         # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
         # Any other non-zero exit code (1 = test failure) is a real error.
+        shell: bash
         run: pytest tests/benchmarks/ -v --tb=long --no-cov || [ $? -eq 5 ]
 
   docs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, haul-pave]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

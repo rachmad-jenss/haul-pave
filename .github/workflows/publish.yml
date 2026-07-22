@@ -5,9 +5,13 @@ on:
     tags:
       - "v*"
 
+defaults:
+  run:
+    shell: powershell
+
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, haul-pave]
     permissions:
       contents: read
       id-token: write
