@@ -41,7 +41,8 @@ jobs:
       - name: Lint with ruff
         run: ruff check src/ tests/
       - name: Format check with ruff
-        run: ruff format --check src/ tests/
+        # Limit to Python sources — avoid ruff treating benchmark dossier Markdown as code.
+        run: ruff format --check src/ tests/ --exclude '**/*.md'
       - name: Type check with mypy
         run: mypy src/haulpave/
 
