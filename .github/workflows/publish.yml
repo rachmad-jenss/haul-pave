@@ -5,13 +5,14 @@ on:
     tags:
       - "v*"
 
+# Public OSS repo: GitHub-hosted runners only (no self-hosted).
 defaults:
   run:
-    shell: powershell
+    shell: bash
 
 jobs:
   publish:
-    runs-on: [self-hosted, Windows, X64, haul-pave]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write

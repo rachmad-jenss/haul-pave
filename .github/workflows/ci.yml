@@ -21,14 +21,15 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Public OSS repo: GitHub-hosted runners only (no self-hosted).
 defaults:
   run:
-    shell: powershell
+    shell: bash
 
 jobs:
   quality:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    runs-on: [self-hosted, Windows, X64, haul-pave]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -40,13 +41,14 @@ jobs:
       - name: Lint with ruff
         run: ruff check src/ tests/
       - name: Format check with ruff
-        run: ruff format --check src/ tests/
+        # Limit to Python sources — avoid ruff treating benchmark dossier Markdown as code.
+        run: ruff format --check src/ tests/ --exclude '**/*.md'
       - name: Type check with mypy
         run: mypy src/haulpave/
 
   test:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    runs-on: [self-hosted, Windows, X64, haul-pave]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
@@ -66,7 +68,6 @@ jobs:
       - name: Run tests with coverage
         id: run-tests
         continue-on-error: true
-        shell: bash
         run: |
           set -o pipefail
           python --version
@@ -75,7 +76,6 @@ jobs:
         if: steps.run-tests.outcome == 'failure' && github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
         run: |
           {
             echo "**CI Test Failure — Python ${{ matrix.python-version }}**"
@@ -99,12 +99,11 @@ jobs:
       - name: Run benchmark tests
         # Exit code 5 = "no tests collected" — expected until Phase 0 benchmarks land.
         # Any other non-zero exit code (1 = test failure) is a real error.
-        shell: bash
         run: pytest tests/benchmarks/ -v --tb=long --no-cov || [ $? -eq 5 ]
 
   docs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, Windows, X64, haul-pave]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
